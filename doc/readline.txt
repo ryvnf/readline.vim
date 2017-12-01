@@ -1,9 +1,12 @@
 *readline.txt* Readline-style mappings for command mode
 
-==============================================================================
-INTRO						*readline* *readline-intro*
+Author: Elias Astrom <github.com/ryvnf>
+License: Same terms as Vim itself (see |license|)
 
-This plugin will add a subset of readlines default bindings to VIM's command
+==============================================================================
+INTRO							*readline*
+
+This plugin will add a subset of readline's default bindings to VIM's command
 mode.  It implements the most commonly used functionality from readline, which
 includes moving and deleting by words and some other stuff.
 
@@ -16,6 +19,7 @@ default Vim functionality is useful, it should still be accessible through other
 mappings (like |c_CTRL-X_CTRL-E|).
 
 ==============================================================================
+MAPPINGS						*readline-mappings*
 
 							*c_CTRL-B*
 CTRL-B		Move cursor left.
@@ -28,19 +32,19 @@ CTRL-F		Move cursor right.  Use |CTRL-X_CTRL-E| to access the overridden
 <M-f> or						*c_<M-F>*
 <M-F> or						*c_<Esc>f*
 <Esc>f or						*c_<Esc>F*
-<Esc>F		Move cursor to beginning of next word.  Word is delimeted by
+<Esc>F		Move cursor forward to end of word.  Word is delimeted by
 		non-alphanumeric characters.
 
 							*c_<M-b>*
 <M-b> or						*c_<M-B>*
 <M-B> or						*c_<Esc>b*
 <Esc>b or						*c_<Esc>B*
-<Esc>B		Move cursor to beginning of previous word.  Word is delimeted by
+<Esc>B		Move cursor back to start of word.  Word is delimeted by
 		non-alphanumeric characters.
 
 							*c_CTRL-A*
 CTRL-A		Move cursor to beginning of line.  Use |<M-star>| or
-		|<Esc>start| to access the overridden VIM mapping.
+		|<Esc>star| to access the overridden Vim default mapping.
 
 							*c_CTRL-E*
 CTRL-E		Move cursor to end of line.
@@ -50,20 +54,21 @@ CTRL-H or						*c_<BS>*
 <BS>		Delete character before cursor.
 
 							*c_CTRL-D*
-CTRL-D		Delete character under cursor.
+CTRL-D		Delete character under cursor. Use <M-?> or <Esc>? to access
+		the overridden VIM default mapping.
 
 							*c_<M-C-H>* 
 <M-C-H> or						*c_<M-BS>* 
 <M-BS> or						*c_<Esc>CTRL-H* 
 <Esc>CTRL-H or						*c_<Esc><BS>* 
-<Esc><BS>	Delete to beginning of previous word.  Word is delimeted by
+<Esc><BS>	Delete back to start of previous word.  Word is delimeted by
 		non-alphanumeric characters.
 
 							*c_<M-d>* 
 <M-d> or						*c_<M-D>* 
 <M-D> or						*c_<Esc>d* 
 <Esc>d or						*c_<Esc>D* 
-<Esc>D		Delete to beginning of previous word.  Word is delimeted by
+<Esc>D		Delete forward to end of word.  Word is delimeted by
 		non-alphanumeric characters.
 
 							*c_CTRL-U*
@@ -79,6 +84,17 @@ CTRL-W		Delete to beginning of previous word.  Word is delimeted by
 							*c_CTRL-T*
 CTRL-T		Transpose characters before the cursor.
 
+							*c_CTRL-Y*
+CTRL-Y		Yank (paste) previously deleted text.  Only text deleted
+		through commands which operate on words or lines can be
+		recalled.
+
+							*c_<M-?>*
+<M-?>							*c_<Esc>?*
+<Esc>?		Display all names that match pattern in front of cursor.
+		Replacement for the default |c_CTRL-D| mapping which gets
+		overridden.
+
 							*c_<M-star>*
 <M-*>							*c_<Esc>star*
 <Esc>*		Insert all names that match pattern in front of cursor.
@@ -91,7 +107,7 @@ CTRL-X CTRL-E	Open command-line window.  See |cmdline| for more information.
 		overridden.
 
 ==============================================================================
-WHAT ABOUT INSERT MODE?				*readline-insert*
+INSERT MODE					*readline-insert*
 
 This plugin does not add readline-style commands to insert mode.  This is
 because it is not very useful, as experienced Vim users will use normal mode for
@@ -100,8 +116,8 @@ override a lot of useful default Vim bindings.  Some mappings also use <Esc>
 which might cause problems with mode switching if used in insert-mode.
 
 ==============================================================================
-CREDITS						*readline-credits*
+BUGS						*readline-bugs*
 
-This plugin was created Elias Astrom <github.com/ryvnf>.  The VIM LICENSE
-applies to the files in this package. So it is distributed under the same
-conditions as VIM itself.
+This plugin has problems handling unicode characters.  Non-ascii alphabetic
+characters are not recognized as word characters and movement and deletion
+becomes inaccurate when the command-line contains multi-byte characters.
