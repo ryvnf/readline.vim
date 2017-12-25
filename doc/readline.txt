@@ -1,7 +1,8 @@
 *readline.txt* Readline-style mappings for command mode
 
-Author: Elias Astrom <github.com/ryvnf>
-License: Same terms as Vim itself (see |license|)
+Author:		Elias Astrom <github.com/ryvnf>
+Licence:	The VIM LICENSE (see |license|).  This Plugin is distributed
+		under the same conditions as Vim itself.
 
 ==============================================================================
 INTRO							*readline*
@@ -110,14 +111,14 @@ CTRL-X CTRL-E	Open command-line window.  See |cmdline| for more information.
 INSERT MODE					*readline-insert*
 
 This plugin does not add readline-style commands to insert mode.  This is
-because it is not very useful, as experienced Vim users will use normal mode for
-these commands.  Implementing these mappings bindings in insert mode will also
+because it is not very useful, as experienced Vim users will use normal mode
+for these commands.  Implementing these mappings in insert mode would also
 override a lot of useful default Vim bindings.  Some mappings also use <Esc>
-which might cause problems with mode switching if used in insert-mode.
+which might cause problems with mode switching if implemented in insert-mode.
 
 ==============================================================================
 BUGS						*readline-bugs*
 
-This plugin has problems handling unicode characters.  Non-ascii alphabetic
-characters are not recognized as word characters and movement and deletion
-becomes inaccurate when the command-line contains multi-byte characters.
+This plugin previously had problems dealing with non-ASCII characters in the
+command-line.  That has been solved now.  If happen to find new bugs, please
+create issue at <github.com/ryvnf/readline.vim>.

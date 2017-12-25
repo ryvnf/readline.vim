@@ -2,7 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2017 Nov 30
+" Last Change:  2017 Dec 25
 " Licence:      The VIM-LICENSE.  This Plugin is distributed under the same
 "               conditions as VIM itself.
 " ============================================================================
@@ -24,25 +24,25 @@ cnoremap <c-b> <left>
 cnoremap <c-f> <right>
 
 " move back to start of word
-cnoremap <expr> <m-b> <sid>move_to(<sid>prev_word('[[:alnum:]]'))
+cnoremap <expr> <m-b> <sid>move_to(<sid>back_word())
 cmap <esc>b <m-b>
 
 " move forward to end of word
-cnoremap <expr> <m-f> <sid>move_to(<sid>next_word('[[:alnum:]]'))
+cnoremap <expr> <m-f> <sid>move_to(<sid>forward_word())
 cmap <esc>f <m-f>
 
 " delete char under cursor
 cnoremap <expr> <c-d> getcmdpos() <= strlen(getcmdline()) ? "\<del>" : ""
 
 " delete back to start of word
-cnoremap <expr> <m-bs> <sid>delete_to(<sid>prev_word('[[:alnum:]]'))
+cnoremap <expr> <m-bs> <sid>delete_to(<sid>back_word())
 cmap <esc><bs> <m-bs>
 
-" delete back to start of white-space delimeted word
-cnoremap <expr> <c-w> <sid>delete_to(<sid>prev_word('[^[:space:]]'))
+" delete back to start of space delimited word
+cnoremap <expr> <c-w> <sid>delete_to(<sid>back_longword())
 
 " delete forward to end of word
-cnoremap <expr> <m-d> <sid>delete_to(<sid>next_word('[[:alnum:]]'))
+cnoremap <expr> <m-d> <sid>delete_to(<sid>forward_word())
 cmap <esc>d <m-d>
 
 " delete to start of line
@@ -69,61 +69,73 @@ cmap <esc>* <m-*>
 cnoremap <c-x><c-e> <c-f>
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-" internal functions
+" internal variables
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+" [:alnum:] and [:alpha:] only matches ASCII characters.  But we can use the
+" fact that [:upper:] and [:lower:] will match non-ASCII characters to create
+" a pattern which will match alphanumeric characters from all encodings.
+let s:wordchars = '[[:upper:][:lower:][:digit:]]'
 
 " buffer to hold the previously deleted text
 let s:yankbuf = ""
 
-" create mapping to transpose chars
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+" internal functions
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+" get mapping to transpose chars
 function! s:transpose()
-  let l:i = getcmdpos() - 1
-  let l:s = getcmdline()
-  let l:n = strlen(l:s)
+  let l:s = getcmdline() . " "
+  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
+  let l:n = strchars(l:s)
   let l:cmd = ""
   if l:i == 0 || l:n < 2
     return ""
   endif
-  if l:i == l:n
+  if l:i == l:n - 1
     let l:cmd .= "\<left>"
     let l:i -= 1
   endif
-  return l:cmd . "\b\<right>" . l:s[l:i - 1]
+  return l:cmd . "\<bs>\<right>\<c-v>" . strcharpart(l:s, l:i - 1, 1)
 endfunction
 
-" create mapping to move to position x
+" get mapping to move to position x
 function! s:move_to(x)
   let l:cmd = ""
-  let l:i = a:x - (getcmdpos() - 1)
-  if l:i > 0
-    while l:i != 0
+  let l:y = strchars((getcmdline() . " ")[:getcmdpos() - 1]) - 1
+  if l:y < a:x
+    while l:y < a:x
       let l:cmd .= "\<right>"
-      let l:i -= 1
+      let l:y += 1
     endwhile
   else
-    while l:i != 0
+    while a:x < l:y
       let l:cmd .= "\<left>"
-      let l:i += 1
+      let l:y -= 1
     endwhile
   endif
   return l:cmd
 endfunction
 
-" create mapping to delete to position x
+" get mapping to delete to position x
 function! s:delete_to(x)
   let l:cmd = ""
-  let l:i = a:x - (getcmdpos() - 1)
-  if l:i > 0
-    let s:yankbuf = getcmdline()[getcmdpos():a:x]
-    while l:i != 0
+  let l:s = getcmdline() . " "
+  let l:x = a:x
+  let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
+  let s:yankbuf = ""
+  if l:y < l:x
+    while l:y < l:x
       let l:cmd .= "\<del>"
-      let l:i -= 1
+      let s:yankbuf .= "\<c-v>" . strcharpart(l:s, l:y, 1)
+      let l:y += 1
     endwhile
   else
-    let s:yankbuf = getcmdline()[a:x:getcmdpos()]
-    while l:i != 0
-      let l:cmd .= "\b"
-      let l:i += 1
+    while l:x < l:y
+      let l:cmd .= "\<bs>"
+      let s:yankbuf .= "\<c-v>" . strcharpart(l:s, l:x, 1)
+      let l:x += 1
     endwhile
   endif
   return l:cmd
@@ -134,28 +146,41 @@ function! s:yank()
   return s:yankbuf
 endfunction
 
-" get position of previous longword
-function! s:prev_word(wordchars)
-  let l:s = getcmdline()
-  let l:i = getcmdpos() - 1
-  while l:i > 0 && l:s[l:i - 1] !~ a:wordchars
+" get word start position behind cursor
+function! s:back_word()
+  let l:s = getcmdline() . " "
+  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
+  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) !~ s:wordchars
     let l:i -= 1
   endwhile
-  while l:i > 0 && l:s[l:i - 1] =~ a:wordchars
+  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) =~ s:wordchars
     let l:i -= 1
   endwhile
   return l:i
 endfunction
 
-" get position of next word
-function! s:next_word(wordchars)
+" get longword start position behind cursor
+function! s:back_longword()
+  let l:s = getcmdline() . " "
+  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
+  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) =~ '[[:space:]]'
+    let l:i -= 1
+  endwhile
+  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) !~ '[[:space:]]'
+    let l:i -= 1
+  endwhile
+  return l:i
+endfunction
+
+" get word end position in front of cursor
+function! s:forward_word()
   let l:s = getcmdline()
-  let l:n = strlen(l:s)
-  let l:i = getcmdpos() - 1
-  while l:i < l:n && l:s[l:i] !~ a:wordchars
+  let l:n = strchars(l:s)
+  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
+  while l:i < l:n && strcharpart(l:s, l:i, 1) !~ s:wordchars
     let l:i += 1
   endwhile
-  while l:i < l:n && l:s[l:i] =~ a:wordchars
+  while l:i < l:n && strcharpart(l:s, l:i, 1) =~ s:wordchars
     let l:i += 1
   endwhile
   return l:i
