@@ -7,12 +7,12 @@ Licence:	The VIM LICENSE (see |license|).  This Plugin is distributed
 ==============================================================================
 INTRO							*readline*
 
-This plugin will add a subset of readline's default bindings to VIM's command
+This plugin will add a subset of readline's default bindings to Vim's command
 mode.  It implements the most commonly used functionality from readline, which
 includes moving and deleting by words and some other stuff.
 
 The word movement and deletion commands implemented by this plugin will skip
-word delimeters, this is different from what VIM usually does.  The change is
+word delimeters, this is different from what Vim usually does.  The change is
 made to be more like readline, which also has this behavior.
 
 Some mappings will override default Vim functionality (like |c_CTRL-F|).  If the
@@ -89,6 +89,24 @@ CTRL-T		Transpose characters before the cursor.
 CTRL-Y		Yank (paste) previously deleted text.  Only text deleted
 		through commands which operate on words or lines can be
 		recalled.
+
+							*c_<M-u>*
+<M-u> or						*c_<M-U>*
+<M-U> or						*c_<Esc>u*
+<Esc>u or						*c_<Esc>U*
+<Esc>U          Make word in front of cursor UPPERCASE.
+
+							*c_<M-l>*
+<M-l> or						*c_<M-L>*
+<M-L> or						*c_<Esc>l*
+<Esc>l or						*c_<Esc>L*
+<Esc>L          Make word in front of cursor lowercase.
+
+							*c_<M-c>*
+<M-c> or						*c_<M-C>*
+<M-C> or						*c_<Esc>c*
+<Esc>c or						*c_<Esc>C*
+<Esc>C          Make word in front of cursor Capitalized.
 
 							*c_<M-?>*
 <M-?>							*c_<Esc>?*

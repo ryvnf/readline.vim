@@ -57,6 +57,18 @@ cnoremap <expr> <c-t> <sid>transpose()
 " yank (paste) previously deleted text
 cnoremap <expr> <c-y> <sid>yank()
 
+" make word uppercase
+cnoremap <expr> <m-u> <sid>upcase_word()
+cmap <esc>u <m-u>
+
+" make word lowercase
+cnoremap <expr> <m-l> <sid>downcase_word()
+cmap <esc>l <m-l>
+
+" make word capitalized
+cnoremap <expr> <m-c> <sid>capitalize_word()
+cmap <esc>c <m-c>
+
 " list all completion matches
 cnoremap <m-?> <c-d>
 cmap <esc>? <m-?>
@@ -141,7 +153,60 @@ function! s:delete_to(x)
   return l:cmd
 endfunction
 
-" create mapping to yank (paste) the previously deleted text
+" get mapping to make word uppercase
+function! s:upcase_word()
+  let l:cmd = ""
+  let l:s = getcmdline() . " "
+  let l:x = s:forward_word()
+  let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
+  let s:yankbuf = ""
+  while l:y < l:x
+    let l:cmd .= "\<del>\<c-v>" . toupper(strcharpart(l:s, l:y, 1))
+    let l:y += 1
+  endwhile
+  return l:cmd
+endfunction
+
+" get mapping to make word lowercase
+function! s:downcase_word()
+  let l:cmd = ""
+  let l:s = getcmdline() . " "
+  let l:x = s:forward_word()
+  let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
+  let s:yankbuf = ""
+  while l:y < l:x
+    let l:cmd .= "\<del>\<c-v>" . tolower(strcharpart(l:s, l:y, 1))
+    let l:y += 1
+  endwhile
+  return l:cmd
+endfunction
+
+" get mapping to make word capitalized
+function! s:capitalize_word()
+  let l:cmd = ""
+  let l:s = getcmdline() . " "
+  let l:x = s:forward_word()
+  let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
+  let s:yankbuf = ""
+  while l:y < l:x
+    let l:c = strcharpart(l:s, l:y, 1)
+    if l:c =~ s:wordchars
+      let l:cmd .= "\<del>\<c-v>" . toupper(strcharpart(l:s, l:y, 1))
+      let l:y += 1
+      break
+    else
+      let l:cmd .= "\<right>"
+    endif
+    let l:y += 1
+  endwhile
+  while l:y < l:x
+    let l:cmd .= "\<del>\<c-v>" . tolower(strcharpart(l:s, l:y, 1))
+    let l:y += 1
+  endwhile
+  return l:cmd
+endfunction
+
+" get mapping to yank (paste) the previously deleted text
 function! s:yank()
   return s:yankbuf
 endfunction
