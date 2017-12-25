@@ -1,4 +1,4 @@
-*readline.txt* Readline-style mappings for command mode
+*readline.txt*	Readline-style mappings for command mode
 
 Author:		Elias Astrom <github.com/ryvnf>
 Licence:	The VIM LICENSE (see |license|).  This Plugin is distributed
@@ -12,7 +12,7 @@ mode.  It implements the most commonly used functionality from readline, which
 includes moving and deleting by words and some other stuff.
 
 The word movement and deletion commands implemented by this plugin will skip
-word delimeters, this is different from what Vim usually does.  The change is
+word delimiters, this is different from what Vim usually does.  The change is
 made to be more like readline, which also has this behavior.
 
 Some mappings will override default Vim functionality (like |c_CTRL-F|).  If the
@@ -23,107 +23,119 @@ mappings (like |c_CTRL-X_CTRL-E|).
 MAPPINGS						*readline-mappings*
 
 							*c_CTRL-B*
-CTRL-B		Move cursor left.
+CTRL-B			Move cursor left.
 
 							*c_CTRL-F*
-CTRL-F		Move cursor right.  Use |CTRL-X_CTRL-E| to access the overridden
-		VIM mapping.
+CTRL-F			Move cursor right.  Use |CTRL-X_CTRL-E| to access the
+			overridden Vim mapping.
 
-							*c_<M-f>*
-<M-f> or						*c_<M-F>*
-<M-F> or						*c_<Esc>f*
-<Esc>f or						*c_<Esc>F*
-<Esc>F		Move cursor forward to end of word.  Word is delimeted by
-		non-alphanumeric characters.
+							*c_<Esc>b*
+<Esc>b		or					*c_<Esc>B*
+<Esc>B			Move cursor back to start of word.  Word is delimited by
+			non-alphanumeric characters.
 
-							*c_<M-b>*
-<M-b> or						*c_<M-B>*
-<M-B> or						*c_<Esc>b*
-<Esc>b or						*c_<Esc>B*
-<Esc>B		Move cursor back to start of word.  Word is delimeted by
-		non-alphanumeric characters.
+							*c_<Esc>f*
+<Esc>f		or					*c_<Esc>F*
+<Esc>F			Move cursor forward to end of word.  Word is delimited
+			by non-alphanumeric characters.
 
 							*c_CTRL-A*
-CTRL-A		Move cursor to beginning of line.  Use |<M-star>| or
-		|<Esc>star| to access the overridden Vim default mapping.
+CTRL-A			Move cursor to beginning of line.  Use |<M-star>| or
+			|<Esc>star| to access the overridden default Vim
+			mapping.
 
 							*c_CTRL-E*
-CTRL-E		Move cursor to end of line.
+CTRL-E			Move cursor to end of line.
 
 							*c_CTRL-H*
-CTRL-H or						*c_<BS>*
-<BS>		Delete character before cursor.
+CTRL-H		or					*c_<BS>*
+<BS>			Delete character before cursor.
 
 							*c_CTRL-D*
-CTRL-D		Delete character under cursor. Use <M-?> or <Esc>? to access
-		the overridden VIM default mapping.
+CTRL-D			Delete character under cursor.  Use <Esc>? to access
+			the overridden default Vim mapping.
 
-							*c_<M-C-H>* 
-<M-C-H> or						*c_<M-BS>* 
-<M-BS> or						*c_<Esc>CTRL-H* 
-<Esc>CTRL-H or						*c_<Esc><BS>* 
-<Esc><BS>	Delete back to start of previous word.  Word is delimeted by
-		non-alphanumeric characters.
+							*c_<Esc>CTRL-H*
+<Esc>CTRL-H	or					*c_<Esc><BS>*
+<Esc><BS>		Delete back to start of previous word.  Word is
+			delimited by non-alphanumeric characters.
 
-							*c_<M-d>* 
-<M-d> or						*c_<M-D>* 
-<M-D> or						*c_<Esc>d* 
-<Esc>d or						*c_<Esc>D* 
-<Esc>D		Delete forward to end of word.  Word is delimeted by
-		non-alphanumeric characters.
+							*c_CTRL-W*
+CTRL-W			Delete to beginning of previous word.  Word is
+			delimited by spaces.
+
+							*c_<Esc>d*
+<Esc>d		or					*c_<Esc>D*
+<Esc>D			Delete forward to end of word.  Word is delimited by
+			non-alphanumeric characters.
 
 							*c_CTRL-U*
-CTRL-U		Delete to beginning of line.
+CTRL-U			Delete to beginning of line.
 
 							*c_CTRL-K*
-CTRL-K		Delete to end of line.
-
-							*c_CTRL-W* 
-CTRL-W		Delete to beginning of previous word.  Word is delimeted by
-		spaces.
+CTRL-K			Delete to end of line.  This overrides the default
+			Vim mapping to insert digraph.  You can set
+			|'digraph'| to be able to insert digraphs using <BS>
+			instead.
 
 							*c_CTRL-T*
-CTRL-T		Transpose characters before the cursor.
+CTRL-T			Transpose characters before the cursor.
 
 							*c_CTRL-Y*
-CTRL-Y		Yank (paste) previously deleted text.  Only text deleted
-		through commands which operate on words or lines can be
-		recalled.
+CTRL-Y			Yank (paste) previously deleted text.  Only text
+			deleted through commands which operate on words or
+			lines can be recalled.
 
-							*c_<M-u>*
-<M-u> or						*c_<M-U>*
-<M-U> or						*c_<Esc>u*
-<Esc>u or						*c_<Esc>U*
-<Esc>U          Make word in front of cursor UPPERCASE.
+							*c_<Esc>u*
+<Esc>u		or					*c_<Esc>U*
+<Esc>U			Make word in front of cursor UPPERCASE.
 
-							*c_<M-l>*
-<M-l> or						*c_<M-L>*
-<M-L> or						*c_<Esc>l*
-<Esc>l or						*c_<Esc>L*
-<Esc>L          Make word in front of cursor lowercase.
+							*c_<Esc>l*
+<Esc>l		or					*c_<Esc>L*
+<Esc>L			Make word in front of cursor lowercase.
 
-							*c_<M-c>*
-<M-c> or						*c_<M-C>*
-<M-C> or						*c_<Esc>c*
-<Esc>c or						*c_<Esc>C*
-<Esc>C          Make word in front of cursor Capitalized.
+							*c_<Esc>c*
+<Esc>c		or					*c_<Esc>C*
+<Esc>C			Make word in front of cursor Capitalized.
 
-							*c_<M-?>*
-<M-?>							*c_<Esc>?*
-<Esc>?		Display all names that match pattern in front of cursor.
-		Replacement for the default |c_CTRL-D| mapping which gets
-		overridden.
+							*c_<Esc>?*
+<Esc>?			Display all names that match pattern in front of
+			cursor.  Replacement for the default |c_CTRL-D|
+			mapping which gets overridden.
 
-							*c_<M-star>*
-<M-*>							*c_<Esc>star*
-<Esc>*		Insert all names that match pattern in front of cursor.
-		Replacement for the default |c_CTRL-A| mapping which gets
-		overridden.
+							*c_<Esc>star*
+<Esc>*			Insert all names that match pattern in front of
+			cursor.  Replacement for the default |c_CTRL-A|
+			mapping which gets overridden.
 
 							*c_CTRL-X_CTRL-E*
-CTRL-X CTRL-E	Open command-line window.  See |cmdline| for more information.
-		Replacement for the default |c_CTRL-F| mapping which gets
-		overridden.
+CTRL-X CTRL-E		Open command-line window.  See |cmdline| for more
+			information.  Replacement for the default |c_CTRL-F|
+			mapping which gets overridden.
+
+==============================================================================
+META KEY					*readline-meta*
+
+This plugin uses <Esc> for META keys.  Previously the commands where also
+accessed by using the ALT or META modifier, but that caused problems where
+some accented characters like ä would be interpreted as meta-key commands and
+trigger mappings.
+
+If that is not a problem for you, then you can use the following mappings to
+make the commands accessible by holding the META or ALT modifier.
+
+  :cmap <M-b> <Esc>b
+  :cmap <M-f> <Esc>f
+  :cmap <M-bs> <Esc><BS>
+  :cmap <M-d> <Esc>d
+  :cmap <M-u> <Esc>u
+  :cmap <M-l> <Esc>l
+  :cmap <M-c> <Esc>c
+  :cmap <M-?> <Esc>?
+  :cmap <M-star> <Esc>*
+
+Also note that most terminals can be configured to send <Esc><Key> when <Key>
+is pressed the ALT modifier is held.
 
 ==============================================================================
 INSERT MODE					*readline-insert*
@@ -137,6 +149,5 @@ which might cause problems with mode switching if implemented in insert-mode.
 ==============================================================================
 BUGS						*readline-bugs*
 
-This plugin previously had problems dealing with non-ASCII characters in the
-command-line.  That has been solved now.  If happen to find new bugs, please
-create issue at <github.com/ryvnf/readline.vim>.
+If happen to find a bug, please create issue at
+<github.com/ryvnf/readline.vim>.

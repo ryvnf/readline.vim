@@ -24,26 +24,25 @@ cnoremap <c-b> <left>
 cnoremap <c-f> <right>
 
 " move back to start of word
-cnoremap <expr> <m-b> <sid>move_to(<sid>back_word())
-cmap <esc>b <m-b>
+cnoremap <expr> <esc>b <sid>move_to(<sid>back_word())
+cmap <esc>B <esc>b
 
 " move forward to end of word
-cnoremap <expr> <m-f> <sid>move_to(<sid>forward_word())
-cmap <esc>f <m-f>
+cnoremap <expr> <esc>f <sid>move_to(<sid>forward_word())
+cmap <esc>F <esc>f
 
 " delete char under cursor
 cnoremap <expr> <c-d> getcmdpos() <= strlen(getcmdline()) ? "\<del>" : ""
 
 " delete back to start of word
-cnoremap <expr> <m-bs> <sid>delete_to(<sid>back_word())
-cmap <esc><bs> <m-bs>
+cnoremap <expr> <esc><bs> <sid>delete_to(<sid>back_word())
 
 " delete back to start of space delimited word
 cnoremap <expr> <c-w> <sid>delete_to(<sid>back_longword())
 
 " delete forward to end of word
-cnoremap <expr> <m-d> <sid>delete_to(<sid>forward_word())
-cmap <esc>d <m-d>
+cnoremap <expr> <esc>d <sid>delete_to(<sid>forward_word())
+cmap <esc>D <esc>d
 
 " delete to start of line
 cnoremap <expr> <c-u> <sid>delete_to(0)
@@ -52,30 +51,28 @@ cnoremap <expr> <c-u> <sid>delete_to(0)
 cnoremap <expr> <c-k> <sid>delete_to(strlen(getcmdline()))
 
 " transpose characters before cursor
-cnoremap <expr> <c-t> <sid>transpose()
+cnoremap <expr> <c-t> <sid>transpose_chars()
 
 " yank (paste) previously deleted text
 cnoremap <expr> <c-y> <sid>yank()
 
 " make word uppercase
-cnoremap <expr> <m-u> <sid>upcase_word()
-cmap <esc>u <m-u>
+cnoremap <expr> <esc>u <sid>upcase_word()
+cnoremap <esc>D <esc>d
 
 " make word lowercase
-cnoremap <expr> <m-l> <sid>downcase_word()
-cmap <esc>l <m-l>
+cnoremap <expr> <esc>l <sid>downcase_word()
+cnoremap <esc>L <esc>l
 
 " make word capitalized
-cnoremap <expr> <m-c> <sid>capitalize_word()
-cmap <esc>c <m-c>
+cnoremap <expr> <esc>c <sid>capitalize_word()
+cnoremap <esc>C <esc>c
 
 " list all completion matches
-cnoremap <m-?> <c-d>
-cmap <esc>? <m-?>
+cnoremap <esc>? <c-d>
 
 " insert all completion matches
-cnoremap <m-*> <c-a>
-cmap <esc>* <m-*>
+cnoremap <esc>* <c-a>
 
 " open cmdline-window
 cnoremap <c-x><c-e> <c-f>
@@ -97,19 +94,19 @@ let s:yankbuf = ""
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 " get mapping to transpose chars
-function! s:transpose()
-  let l:s = getcmdline() . " "
-  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
+function! s:transpose_chars()
+  let l:s = getcmdline() . " " " space so cursor can be at end
+  let l:x = strchars(l:s[:getcmdpos() - 1]) - 1
   let l:n = strchars(l:s)
   let l:cmd = ""
-  if l:i == 0 || l:n < 2
+  if l:x == 0 || l:n < 2
     return ""
   endif
-  if l:i == l:n - 1
+  if l:x == l:n - 1
     let l:cmd .= "\<left>"
-    let l:i -= 1
+    let l:x -= 1
   endif
-  return l:cmd . "\<bs>\<right>\<c-v>" . strcharpart(l:s, l:i - 1, 1)
+  return l:cmd . "\<bs>\<right>\<c-v>" . strcharpart(l:s, l:x - 1, 1)
 endfunction
 
 " get mapping to move to position x
@@ -133,7 +130,7 @@ endfunction
 " get mapping to delete to position x
 function! s:delete_to(x)
   let l:cmd = ""
-  let l:s = getcmdline() . " "
+  let l:s = getcmdline() . " " " space so cursor can be at end
   let l:x = a:x
   let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
   let s:yankbuf = ""
@@ -156,7 +153,7 @@ endfunction
 " get mapping to make word uppercase
 function! s:upcase_word()
   let l:cmd = ""
-  let l:s = getcmdline() . " "
+  let l:s = getcmdline() . " " " space so cursor can be at end
   let l:x = s:forward_word()
   let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
   let s:yankbuf = ""
@@ -170,7 +167,7 @@ endfunction
 " get mapping to make word lowercase
 function! s:downcase_word()
   let l:cmd = ""
-  let l:s = getcmdline() . " "
+  let l:s = getcmdline() . " " " space so cursor can be at end
   let l:x = s:forward_word()
   let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
   let s:yankbuf = ""
@@ -184,20 +181,19 @@ endfunction
 " get mapping to make word capitalized
 function! s:capitalize_word()
   let l:cmd = ""
-  let l:s = getcmdline() . " "
+  let l:s = getcmdline() . " " " space so cursor can be at end
   let l:x = s:forward_word()
   let l:y = strchars(l:s[:getcmdpos() - 1]) - 1
   let s:yankbuf = ""
   while l:y < l:x
     let l:c = strcharpart(l:s, l:y, 1)
+    let l:y += 1
     if l:c =~ s:wordchars
-      let l:cmd .= "\<del>\<c-v>" . toupper(strcharpart(l:s, l:y, 1))
-      let l:y += 1
+      let l:cmd .= "\<del>\<c-v>" . toupper(strcharpart(l:s, l:y - 1, 1))
       break
     else
       let l:cmd .= "\<right>"
     endif
-    let l:y += 1
   endwhile
   while l:y < l:x
     let l:cmd .= "\<del>\<c-v>" . tolower(strcharpart(l:s, l:y, 1))
@@ -213,40 +209,40 @@ endfunction
 
 " get word start position behind cursor
 function! s:back_word()
-  let l:s = getcmdline() . " "
-  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
-  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) !~ s:wordchars
-    let l:i -= 1
+  let l:s = getcmdline() . " " " space so cursor can be at end
+  let l:x = strchars(l:s[:getcmdpos() - 1]) - 1
+  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) !~ s:wordchars
+    let l:x -= 1
   endwhile
-  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) =~ s:wordchars
-    let l:i -= 1
+  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) =~ s:wordchars
+    let l:x -= 1
   endwhile
-  return l:i
+  return l:x
 endfunction
 
 " get longword start position behind cursor
 function! s:back_longword()
-  let l:s = getcmdline() . " "
-  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
-  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) =~ '[[:space:]]'
-    let l:i -= 1
+  let l:s = getcmdline() . " " " space so cursor can be at end
+  let l:x = strchars(l:s[:getcmdpos() - 1]) - 1
+  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) =~ '[[:space:]]'
+    let l:x -= 1
   endwhile
-  while l:i > 0 && strcharpart(l:s, l:i - 1, 1) !~ '[[:space:]]'
-    let l:i -= 1
+  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) !~ '[[:space:]]'
+    let l:x -= 1
   endwhile
-  return l:i
+  return l:x
 endfunction
 
 " get word end position in front of cursor
 function! s:forward_word()
-  let l:s = getcmdline()
+  let l:s = getcmdline() . " " " space so cursor can be at end
   let l:n = strchars(l:s)
-  let l:i = strchars(l:s[:getcmdpos() - 1]) - 1
-  while l:i < l:n && strcharpart(l:s, l:i, 1) !~ s:wordchars
-    let l:i += 1
+  let l:x = strchars(l:s[:getcmdpos() - 1]) - 1
+  while l:x < l:n && strcharpart(l:s, l:x, 1) !~ s:wordchars
+    let l:x += 1
   endwhile
-  while l:i < l:n && strcharpart(l:s, l:i, 1) =~ s:wordchars
-    let l:i += 1
+  while l:x < l:n && strcharpart(l:s, l:x, 1) =~ s:wordchars
+    let l:x += 1
   endwhile
-  return l:i
+  return l:x
 endfunction
