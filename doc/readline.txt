@@ -15,9 +15,9 @@ The word movement and deletion commands implemented by this plugin will skip
 word delimiters, this is different from what Vim usually does.  The change is
 made to be more like readline, which also has this behavior.
 
-Some mappings will override default Vim functionality (like |c_CTRL-F|).  If the
-default Vim functionality is useful, it should still be accessible through other
-mappings (like |c_CTRL-X_CTRL-E|).
+Some mappings will override default Vim functionality (like |c_CTRL-F|).  If
+the default Vim functionality is useful, it should still be accessible through
+other mappings (like |c_CTRL-X_CTRL-E|).
 
 ==============================================================================
 MAPPINGS						*readline-mappings*
@@ -81,6 +81,10 @@ CTRL-K			Delete to end of line.  This overrides the default
 							*c_CTRL-T*
 CTRL-T			Transpose characters before the cursor.
 
+							*c_<Esc>t*
+<Esc>t		or					*c_<Esc>T*
+<Esc>T			Transpose words before the cursor.
+
 							*c_CTRL-Y*
 CTRL-Y			Yank (paste) previously deleted text.  Only text
 			deleted through commands which operate on words or
@@ -128,6 +132,7 @@ make the commands accessible by holding the META or ALT modifier.
   :cmap <M-f> <Esc>f
   :cmap <M-bs> <Esc><BS>
   :cmap <M-d> <Esc>d
+  :cmap <M-t> <Esc>t
   :cmap <M-u> <Esc>u
   :cmap <M-l> <Esc>l
   :cmap <M-c> <Esc>c
