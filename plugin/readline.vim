@@ -2,14 +2,18 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2017 Dec 25
-" Licence:      The VIM-LICENSE.  This Plugin is distributed under the same
+" Last Change:  2017 Dec 27
+" Version:	1.2
+" Licence:      The VIM-LICENSE. This Plugin is distributed under the same
 "               conditions as VIM itself.
 " ============================================================================
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " mappings
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+" to avoid closing the cmdline by accident
+cnoremap <esc> <c-v><esc>
 
 " move to start of line
 cnoremap <c-a> <home>
@@ -24,31 +28,31 @@ cnoremap <c-b> <left>
 cnoremap <c-f> <right>
 
 " move back to start of word
-cnoremap <expr> <esc>b <sid>move_to(<sid>back_word())
+cnoremap <expr> <esc>b <sid>back_word()
 cmap <esc>B <esc>b
 
 " move forward to end of word
-cnoremap <expr> <esc>f <sid>move_to(<sid>forward_word())
+cnoremap <expr> <esc>f <sid>forward_word()
 cmap <esc>F <esc>f
 
 " delete char under cursor
 cnoremap <expr> <c-d> getcmdpos() <= strlen(getcmdline()) ? "\<del>" : ""
 
 " delete back to start of word
-cnoremap <expr> <esc><bs> <sid>delete_to(<sid>back_word())
+cnoremap <expr> <esc><bs> <sid>rubout_word()
 
 " delete back to start of space delimited word
-cnoremap <expr> <c-w> <sid>delete_to(<sid>back_longword())
+cnoremap <expr> <c-w> <sid>rubout_longword()
 
 " delete forward to end of word
-cnoremap <expr> <esc>d <sid>delete_to(<sid>forward_word())
+cnoremap <expr> <esc>d <sid>delete_word()
 cmap <esc>D <esc>d
 
 " delete to start of line
-cnoremap <expr> <c-u> <sid>delete_to(0)
+cnoremap <expr> <c-u> <sid>rubout_line()
 
 " delete to end of line
-cnoremap <expr> <c-k> <sid>delete_to(strlen(getcmdline()))
+cnoremap <expr> <c-k> <sid>delete_line()
 
 " transpose characters before cursor
 cnoremap <expr> <c-t> <sid>transpose_chars()
@@ -85,214 +89,240 @@ cnoremap <c-x><c-e> <c-f>
 " internal variables
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-" [:alnum:] and [:alpha:] only matches ASCII characters.  But we can use the
+" [:alnum:] and [:alpha:] only matches ASCII characters. But we can use the
 " fact that [:upper:] and [:lower:] will match non-ASCII characters to create
-" a pattern which will match alphanumeric characters from all encodings.
-let s:wordchars = "[[:upper:][:lower:][:digit:]]"
+" a pattern that will match alphanumeric characters from all encodings.
+let s:wordchars = '[[:upper:][:lower:][:digit:]]'
 
 " buffer to hold the previously deleted text
-let s:yankbuf = ""
+let s:yankbuf = ''
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " internal functions
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-" get mapping to transpose chars before cursor position
-function! s:transpose_chars()
-  let l:s = getcmdline()
-  let l:n = strchars(l:s)
-  let l:x = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  if l:x == 0 || l:n < 2
-    return ""
-  endif
-  let l:cmd = ""
-  if l:x == l:n
-    let l:cmd .= "\<left>"
-    let l:x -= 1
-  endif
-  return l:cmd . "\b\<right>" .
-  \ substitute(strcharpart(l:s, l:x - 1, 1), "[[:cntrl:]]", "\<c-v>&")
+" get mapping to move one word forward
+function! s:forward_word()
+  let x = s:getcur()
+  return s:move_to(s:next_word(x), x)
 endfunction
 
-" get mapping to transpose words before cursor position
-function! s:transpose_words()
-  let l:s = getcmdline()
-  let l:x = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  let l:end2 = s:forward_word(l:x)
-  if strcharpart(l:s, l:x, 1) == ""
-    let l:x -= 1
-  endif
-  let l:beg2 = s:back_word(l:end2)
-  let l:beg1 = s:back_word(l:beg2)
-  let l:end1 = s:forward_word(l:beg1)
-  if l:beg1 == l:beg2 || l:beg2 < l:end1
-    return ""
-  endif
-  let l:str1 = strcharpart(l:s, l:beg1, l:end1 - l:beg1)
-  let l:str2 = strcharpart(l:s, l:beg2, l:end2 - l:beg2)
-  let l:len1 = strchars(l:str1)
-  let l:len2 = strchars(l:str2)
-  return s:move_to(l:end2, l:x) . repeat("\b", l:len2) .  l:str1 .
-  \ s:move_to(end1, l:beg2 + l:len1) . repeat("\b", l:len1) .
-  \ substitute(l:str2, "[[:cntrl:]]", "\<c-v>&", "g") .
-  \ s:move_to(end2, l:beg1 + l:len2)
+" get mapping to move one word back
+function! s:back_word()
+  let x = s:getcur()
+  return s:move_to(s:prev_word(x), x)
 endfunction
 
-" Get mapping to move cursor to position. The first argument is the position
-" to move to. If the second argument option is used, then it is used as the
-" current cursor position.
-function! s:move_to(...)
-  let l:cmd = ""
-  if a:0 == 1
-    let l:y = strchars((getcmdline() . " ")[:getcmdpos() - 1]) - 1
-  else
-    let l:y = a:2
-  endif
-  if l:y < a:1
-    while l:y < a:1
-      let l:cmd .= "\<right>"
-      let l:y += 1
-    endwhile
-  else
-    while a:1 < l:y
-      let l:cmd .= "\<left>"
-      let l:y -= 1
-    endwhile
-  endif
-  return l:cmd
+" get mapping to rubout word behind cursor
+function! s:rubout_word()
+  let x = s:getcur()
+  return s:delete_to(s:prev_word(x), x)
 endfunction
 
-" get mapping to delete to position
-function! s:delete_to(x)
-  let l:cmd = ""
-  let l:s = getcmdline()
-  let l:x = a:x
-  let l:y = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  let s:yankbuf = ""
-  if l:y < l:x
-    while l:y < l:x
-      let l:cmd .= "\<del>"
-      let s:yankbuf .= strcharpart(l:s, l:y, 1)
-      let l:y += 1
-    endwhile
-  else
-    while l:x < l:y
-      let l:cmd .= "\b"
-      let s:yankbuf .= strcharpart(l:s, l:x, 1)
-      let l:x += 1
-    endwhile
-  endif
-  return l:cmd
+" get mapping to rubout space delimeted word behind of cursor
+function! s:rubout_longword()
+  let x = s:getcur()
+  return s:delete_to(s:prev_longword(x), x)
 endfunction
 
-" Get word start position behind cursor. If an argument is specified, it will
-" be used as the current cursor position.
-function! s:back_word(...)
-  let l:s = getcmdline()
-  if a:0 == 0
-    let l:x = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  else
-    let l:x = a:1
-  end
-  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) !~ s:wordchars
-    let l:x -= 1
-  endwhile
-  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) =~ s:wordchars
-    let l:x -= 1
-  endwhile
-  return l:x
+" get mapping to delete word in front of cursor
+function! s:delete_word()
+  let x = s:getcur()
+  return s:delete_to(s:next_word(x), x)
 endfunction
 
-" Get longword start position behind cursor. If an argument is specified, it
-" will be used as the current cursor position.
-function! s:back_longword(...)
-  let l:s = getcmdline()
-  if a:0 == 0
-	let l:x = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  else
-	let l:x = a:1
-  end
-  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) =~ "[[:space:]]"
-    let l:x -= 1
-  endwhile
-  while l:x > 0 && strcharpart(l:s, l:x - 1, 1) !~ "[[:space:]]"
-    let l:x -= 1
-  endwhile
-  return l:x
+" get mapping to delete to end of line
+function! s:delete_line()
+  return s:delete_to(strchars(getcmdline()), s:getcur())
 endfunction
 
-" Get word end position in front of cursor. If an argument is specified, then
-" it will be used as the current cursor position.
-function! s:forward_word(...)
-  let l:s = getcmdline()
-  let l:n = strchars(l:s)
-  if a:0 == 0
-	let l:x = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  else
-	let l:x = a:1
-  end
-  while l:x < l:n && strcharpart(l:s, l:x, 1) !~ s:wordchars
-    let l:x += 1
-  endwhile
-  while l:x < l:n && strcharpart(l:s, l:x, 1) =~ s:wordchars
-    let l:x += 1
-  endwhile
-  return l:x
+" get mapping to rubout to start of line
+function! s:rubout_line()
+  return s:delete_to(0, s:getcur())
 endfunction
 
 " get mapping to make word uppercase
 function! s:upcase_word()
-  let l:cmd = ""
-  let l:s = getcmdline()
-  let l:x = s:forward_word()
-  let l:y = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  let s:yankbuf = ""
-  while l:y < l:x
-    let l:cmd .= "\<del>" . toupper(strcharpart(l:s, l:y, 1))
-    let l:y += 1
+  let cmd = ""
+  let s = getcmdline()
+  let x = s:getcur()
+  let y = s:next_word(x)
+  while x < y
+    let cmd .= "\<del>" . toupper(strcharpart(s, x, 1))
+    let x += 1
   endwhile
-  return l:cmd
+  return substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to make word lowercase
 function! s:downcase_word()
-  let l:cmd = ""
-  let l:s = getcmdline()
-  let l:x = s:forward_word()
-  let l:y = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  let s:yankbuf = ""
-  while l:y < l:x
-    let l:cmd .= "\<del>" . tolower(strcharpart(l:s, l:y, 1))
-    let l:y += 1
+  let cmd = ""
+  let s = getcmdline()
+  let x = s:getcur()
+  let y = s:next_word(x)
+  while x < y
+    let cmd .= "\<del>" . tolower(strcharpart(s, x, 1))
+    let x += 1
   endwhile
-  return l:cmd
+  return substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to make word capitalized
 function! s:capitalize_word()
-  let l:cmd = ""
-  let l:s = getcmdline()
-  let l:x = s:forward_word()
-  let l:y = strchars((l:s . " ")[:getcmdpos() - 1]) - 1
-  let s:yankbuf = ""
-  while l:y < l:x
-    let l:c = strcharpart(l:s, l:y, 1)
-    let l:y += 1
-    if l:c =~ s:wordchars
-      let l:cmd .= "\<del>" . toupper(strcharpart(l:s, l:y - 1, 1))
+  let cmd = ""
+  let s = getcmdline()
+  let x = s:getcur()
+  let y = s:next_word(x)
+  while x < y
+    let c = strcharpart(s, x, 1)
+    let x += 1
+    if c =~ s:wordchars
+      let cmd .= "\<del>" . toupper(strcharpart(s, x - 1, 1))
       break
     else
-      let l:cmd .= "\<right>"
+      let cmd .= "\<right>"
     endif
   endwhile
-  while l:y < l:x
-    let l:cmd .= "\<del>" . tolower(strcharpart(l:s, l:y, 1))
-    let l:y += 1
+  while x < y
+    let cmd .= "\<del>" . tolower(strcharpart(s, x, 1))
+    let x += 1
   endwhile
-  return l:cmd
+  return substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to yank (paste) the previously deleted text
 function! s:yank()
-  return s:yankbuf
+  return substitute(s:yankbuf, '[[:cntrl:]]', "\<c-v>&", 'g')
+endfunction
+
+" get mapping to transpose chars before cursor position
+function! s:transpose_chars()
+  let s = getcmdline()
+  let n = strchars(s)
+  let x = s:getcur()
+  if x == 0 || n < 2
+    return ""
+  endif
+  let cmd = ""
+  if x == n
+    let cmd .= "\<left>"
+    let x -= 1
+  endif
+  return cmd . "\b\<right>" .
+  \ substitute(strcharpart(s, x - 1, 1), '[[:cntrl:]]', "\<c-v>&", '')
+endfunction
+
+" get mapping to transpose words before cursor position
+function! s:transpose_words()
+  let s = getcmdline()
+  let x = s:getcur()
+  let end2 = s:next_word(x)
+  if strcharpart(s, x, 1) == ""
+    let x -= 1
+  endif
+  let beg2 = s:prev_word(end2)
+  let beg1 = s:prev_word(beg2)
+  let end1 = s:next_word(beg1)
+  if beg1 == beg2 || beg2 < end1
+    return ""
+  endif
+  let str1 = strcharpart(s, beg1, end1 - beg1)
+  let str2 = strcharpart(s, beg2, end2 - beg2)
+  let len1 = strchars(str1)
+  let len2 = strchars(str2)
+  return s:move_to(end2, x) . repeat("\b", len2) . str1 .
+  \ s:move_to(end1, beg2 + len1) . repeat("\b", len1) .
+  \ substitute(str2, '[[:cntrl:]]', "\<c-v>&", 'g') .
+  \ s:move_to(end2, beg1 + len2)
+endfunction
+
+" Get mapping to move cursor to position. Argument x is the position to move
+" to. Argument y is the current cursor position (note that this _must_ be in
+" sync with the real cursor position).
+function! s:move_to(x, y)
+  let cmd = ""
+  let y = a:y
+  if y < a:x
+    while y < a:x
+      let cmd .= "\<right>"
+      let y += 1
+    endwhile
+  else
+    while a:x < y
+      let cmd .= "\<left>"
+      let y -= 1
+    endwhile
+  endif
+  return cmd
+endfunction
+
+" Get mapping to delete from cursor to position. Argument x is the position to
+" delete to. Argument y represents the current cursor position (note that this
+" _must_ be in sync with the real cursor position).
+function! s:delete_to(x, y)
+  let cmd = ""
+  let s = getcmdline()
+  let y = a:y
+  if y < a:x
+    let s:yankbuf = strcharpart(s, y, a:x - y)
+    while y < a:x
+      let cmd .= "\<del>"
+      let y += 1
+    endwhile
+  else
+    let s:yankbuf = strcharpart(s, a:x, y - a:x)
+    while a:x < y
+      let cmd .= "\b"
+      let y -= 1
+    endwhile
+  endif
+  return cmd
+endfunction
+
+" Get start position of previous word. Argument x is the position to search
+" from.
+function! s:prev_word(x)
+  let s = getcmdline()
+  let x = a:x
+  while x > 0 && strcharpart(s, x - 1, 1) !~ s:wordchars
+    let x -= 1
+  endwhile
+  while x > 0 && strcharpart(s, x - 1, 1) =~ s:wordchars
+    let x -= 1
+  endwhile
+  return x
+endfunction
+
+" Get start position of previous space delimeted word. Argument x is the
+" position to search from.
+function! s:prev_longword(x)
+  let s = getcmdline()
+  let x = a:x
+  while x > 0 && strcharpart(s, x - 1, 1) !~ '\S'
+    let x -= 1
+  endwhile
+  while x > 0 && strcharpart(s, x - 1, 1) =~ '\S'
+    let x -= 1
+  endwhile
+  return x
+endfunction
+
+" Get end position of next word. Argument x is the position to search from.
+function! s:next_word(x)
+  let s = getcmdline()
+  let n = strchars(s)
+  let x = a:x
+  while x < n && strcharpart(s, x, 1) !~ s:wordchars
+    let x += 1
+  endwhile
+  while x < n && strcharpart(s, x, 1) =~ s:wordchars
+    let x += 1
+  endwhile
+  return x
+endfunction
+
+" Get the current cursor position on the edit line. This differs from
+" getcmdpos in that it counts chars intead of bytes and starts counting at 0.
+function! s:getcur()
+  return strchars((getcmdline() . " ")[:getcmdpos() - 1]) - 1
 endfunction
