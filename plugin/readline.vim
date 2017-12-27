@@ -2,24 +2,22 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2017 Dec 27
-" Version:	1.2
-" Licence:      The VIM-LICENSE. This Plugin is distributed under the same
-"               conditions as VIM itself.
+" Last Change:  2017 Dec 31
+" Version:	1.4
+" Licence:      The VIM LICENSE
 " ============================================================================
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " mappings
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-" to avoid closing the cmdline by accident
+" avoid closing the cmdline by accident
 cnoremap <esc> <c-v><esc>
 
-" move to start of line
-cnoremap <c-a> <home>
-
-" move to end of line
-cnoremap <c-e> <end>
+" abort currently typed command
+cnoremap <c-g> <nop>
+cnoremap <esc><c-g> <nop>
+cnoremap <c-x><c-g> <nop>
 
 " move to next char
 cnoremap <c-b> <left>
@@ -29,11 +27,17 @@ cnoremap <c-f> <right>
 
 " move back to start of word
 cnoremap <expr> <esc>b <sid>back_word()
-cmap <esc>B <esc>b
+cnoremap <expr> <esc>B <sid>back_word()
 
 " move forward to end of word
 cnoremap <expr> <esc>f <sid>forward_word()
-cmap <esc>F <esc>f
+cnoremap <expr> <esc>F <sid>forward_word()
+
+" move to start of line
+cnoremap <c-a> <home>
+
+" move to end of line
+cnoremap <c-e> <end>
 
 " delete char under cursor
 cnoremap <expr> <c-d> getcmdpos() <= strlen(getcmdline()) ? "\<del>" : ""
@@ -46,10 +50,11 @@ cnoremap <expr> <c-w> <sid>rubout_longword()
 
 " delete forward to end of word
 cnoremap <expr> <esc>d <sid>delete_word()
-cmap <esc>D <esc>d
+cnoremap <expr> <esc>D <sid>delete_word()
 
 " delete to start of line
 cnoremap <expr> <c-u> <sid>rubout_line()
+cnoremap <expr> <c-x><bs> <sid>rubout_line()
 
 " delete to end of line
 cnoremap <expr> <c-k> <sid>delete_line()
@@ -59,25 +64,29 @@ cnoremap <expr> <c-t> <sid>transpose_chars()
 
 " transpose words before cursor
 cnoremap <expr> <esc>t <sid>transpose_words()
-cmap <esc>T <esc>t
+cnoremap <expr> <esc>T <sid>transpose_words()
 
 " yank (paste) previously deleted text
 cnoremap <expr> <c-y> <sid>yank()
 
 " make word uppercase
 cnoremap <expr> <esc>u <sid>upcase_word()
-cnoremap <esc>D <esc>d
+cnoremap <expr> <esc>U <sid>upcase_word()
 
 " make word lowercase
 cnoremap <expr> <esc>l <sid>downcase_word()
-cnoremap <esc>L <esc>l
+cnoremap <expr> <esc>L <sid>downcase_word()
 
 " make word capitalized
 cnoremap <expr> <esc>c <sid>capitalize_word()
-cnoremap <esc>C <esc>c
+cnoremap <expr> <esc>C <sid>capitalize_word()
+
+" comment out line and execute it
+cnoremap <expr> <esc># <c-b>"<cr>
 
 " list all completion matches
 cnoremap <esc>? <c-d>
+cnoremap <esc>= <c-d>
 
 " insert all completion matches
 cnoremap <esc>* <c-a>

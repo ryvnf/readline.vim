@@ -5,7 +5,7 @@ Licence:	The VIM LICENSE (see |license|).  This Plugin is distributed
 		under the same conditions as Vim itself.
 
 ==============================================================================
-INTRO							*readline*
+INTRO						*readline*
 
 This plugin will add a subset of readline's default bindings to Vim's command
 mode.  It implements the most commonly used functionality from readline, which
@@ -20,99 +20,115 @@ the default Vim functionality is useful, it should still be accessible through
 other mappings (like |c_CTRL-X_CTRL-E|).
 
 ==============================================================================
-MAPPINGS						*readline-mappings*
+MAPPINGS					*readline-mappings*
 
-							*c_CTRL-B*
+						*readline-c_CTRL-X_CTRL-G*
+CTRL-X CTRL-G	or				*readline-c_<Esc>CTRL-G*
+<Esc>CTRL-G	or				*readline-c_CTRL-G*
+CTRL-G			No operation.  CTRL-G is used to abort the current
+			command, no matter what keystrokes where typed before
+			it.
+
+						*readline-c_CTRL-B*
 CTRL-B			Move cursor left.
 
-							*c_CTRL-F*
+						*readline-c_CTRL-F*
 CTRL-F			Move cursor right.  Use |CTRL-X_CTRL-E| to access the
 			overridden Vim mapping.
 
-							*c_<Esc>b*
-<Esc>b		or					*c_<Esc>B*
+						*readline-c_<Esc>b*
+<Esc>b		or				*readline-c_<Esc>B*
 <Esc>B			Move cursor back to start of word.  Word is delimited by
 			non-alphanumeric characters.
 
-							*c_<Esc>f*
-<Esc>f		or					*c_<Esc>F*
+						*readline-c_<Esc>f*
+<Esc>f		or				*readline-c_<Esc>F*
 <Esc>F			Move cursor forward to end of word.  Word is delimited
 			by non-alphanumeric characters.
 
-							*c_CTRL-A*
+						*readline-c_CTRL-A*
 CTRL-A			Move cursor to beginning of line.  Use |<M-star>| or
 			|<Esc>star| to access the overridden default Vim
 			mapping.
 
-							*c_CTRL-E*
+						*readline-c_CTRL-E*
 CTRL-E			Move cursor to end of line.
 
-							*c_CTRL-H*
-CTRL-H		or					*c_<BS>*
+						*readline-c_CTRL-H*
+CTRL-H		or				*readline-c_<BS>*
 <BS>			Delete character before cursor.
 
-							*c_CTRL-D*
+						*readline-c_CTRL-D*
 CTRL-D			Delete character under cursor.  Use <Esc>? to access
 			the overridden default Vim mapping.
 
-							*c_<Esc>CTRL-H*
-<Esc>CTRL-H	or					*c_<Esc><BS>*
+						*readline-c_<Esc>CTRL-H*
+<Esc>CTRL-H	or				*readline-c_<Esc><BS>*
 <Esc><BS>		Delete back to start of previous word.  Word is
 			delimited by non-alphanumeric characters.
 
-							*c_CTRL-W*
+						*readline-c_CTRL-W*
 CTRL-W			Delete to beginning of previous word.  Word is
 			delimited by spaces.
 
-							*c_<Esc>d*
-<Esc>d		or					*c_<Esc>D*
+						*readline-c_<Esc>d*
+<Esc>d		or				*readline-c_<Esc>D*
 <Esc>D			Delete forward to end of word.  Word is delimited by
 			non-alphanumeric characters.
 
-							*c_CTRL-U*
+						*readline-c_CTRL-X_CTRL-H*
+CTRL-X CTRL-H					*readline-c_CTRL-X_<BS>*
+CTRL-X <BS>					*readline-c_CTRL-U*
 CTRL-U			Delete to beginning of line.
 
-							*c_CTRL-K*
-CTRL-K			Delete to end of line.  This overrides the default
-			Vim mapping to insert digraph.  You can set
-			|'digraph'| to be able to insert digraphs using <BS>
-			instead.
+						*readline-c_CTRL-K*
+CTRL-K			Delete to end of line.  This overrides the default Vim
+			mapping to insert digraph.  You can set 'digraph' to
+			be able to insert digraphs using <BS> instead. Or you
+			can put `cnoremap <c-k> <c-k>` in your vimrc to
+			restore the default binding.
 
-							*c_CTRL-T*
-CTRL-T			Transpose characters before the cursor.
-
-							*c_<Esc>t*
-<Esc>t		or					*c_<Esc>T*
-<Esc>T			Transpose words before the cursor.
-
-							*c_CTRL-Y*
+						*readline-c_CTRL-Y*
 CTRL-Y			Yank (paste) previously deleted text.  Only text
 			deleted through commands which operate on words or
 			lines can be recalled.
 
-							*c_<Esc>u*
-<Esc>u		or					*c_<Esc>U*
+						*readline-c_CTRL-T*
+CTRL-T			Transpose characters before the cursor.
+
+						*readline-c_<Esc>t*
+<Esc>t		or				*readline-c_<Esc>T*
+<Esc>T			Transpose words before the cursor.
+
+						*readline-c_<Esc>u*
+<Esc>u		or				*readline-c_<Esc>U*
 <Esc>U			Make word in front of cursor UPPERCASE.
 
-							*c_<Esc>l*
-<Esc>l		or					*c_<Esc>L*
+						*readline-c_<Esc>l*
+<Esc>l		or				*readline-c_<Esc>L*
 <Esc>L			Make word in front of cursor lowercase.
 
-							*c_<Esc>c*
-<Esc>c		or					*c_<Esc>C*
+						*readline-c_<Esc>c*
+<Esc>c		or				*readline-c_<Esc>C*
 <Esc>C			Make word in front of cursor Capitalized.
 
-							*c_<Esc>?*
+						*readline-c_<Esc>#*
+<Esc>#			Comment out the current command line and execute it.
+			This will put the line in history for later retrival,
+			without running it.
+
+						*readline-c_<Esc>=*
+<Esc>=		or				*readline-c_<Esc>?*
 <Esc>?			Display all names that match pattern in front of
 			cursor.  Replacement for the default |c_CTRL-D|
 			mapping which gets overridden.
 
-							*c_<Esc>star*
+						*readline-c_<Esc>star*
 <Esc>*			Insert all names that match pattern in front of
 			cursor.  Replacement for the default |c_CTRL-A|
 			mapping which gets overridden.
 
-							*c_CTRL-X_CTRL-E*
+						*readline-c_CTRL-X_CTRL-E*
 CTRL-X CTRL-E		Open command-line window.  See |cmdline| for more
 			information.  Replacement for the default |c_CTRL-F|
 			mapping which gets overridden.
@@ -126,18 +142,28 @@ some accented characters like ä would be interpreted as meta-key commands and
 trigger mappings.
 
 If that is not a problem for you, then you can use the following mappings to
-make the commands accessible by holding the META or ALT modifier.
+make the commands accessible by holding the META or ALT modifier. >
 
+  :cmap <M-C-g> <Esc><C-g>
   :cmap <M-b> <Esc>b
+  :cmap <M-B> <Esc>B
   :cmap <M-f> <Esc>f
+  :cmap <M-F> <Esc>F
   :cmap <M-bs> <Esc><BS>
   :cmap <M-d> <Esc>d
+  :cmap <M-D> <Esc>D
   :cmap <M-t> <Esc>t
+  :cmap <M-T> <Esc>T
   :cmap <M-u> <Esc>u
+  :cmap <M-U> <Esc>U
   :cmap <M-l> <Esc>l
+  :cmap <M-L> <Esc>L
   :cmap <M-c> <Esc>c
+  :cmap <M-C> <Esc>C
   :cmap <M-?> <Esc>?
-  :cmap <M-star> <Esc>*
+  :cmap <M-=> <Esc>=
+  :cmap <M-*> <Esc>*
+<
 
 Also note that most terminals can be configured to send <Esc><Key> when <Key>
 is pressed the ALT modifier is held.
