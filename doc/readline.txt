@@ -1,23 +1,24 @@
 *readline.txt*	Readline-style mappings for command mode
 
-Author:		Elias Astrom <github.com/ryvnf>
-Licence:	The VIM LICENSE (see |license|).  This Plugin is distributed
+Author:		Elias Åstrom <github.com/ryvnf>
+License:	The VIM LICENSE (see |license|).  This Plugin is distributed
 		under the same conditions as Vim itself.
 
 ==============================================================================
 INTRO						*readline*
 
-This plugin will add a subset of readline's default bindings to Vim's command
-mode.  It implements the most commonly used functionality from readline, which
+This plugin will add a subset of Readline's default bindings to Vim's command
+mode.  It implements the most commonly used functionality from Readline, which
 includes moving and deleting by words and some other stuff.
 
 The word movement and deletion commands implemented by this plugin will skip
 word delimiters, this is different from what Vim usually does.  The change is
-made to be more like readline, which also has this behavior.
+made to be more like Readline, which also has this behavior.
 
-Some mappings will override default Vim functionality (like |c_CTRL-F|).  If
-the default Vim functionality is useful, it should still be accessible through
-other mappings (like |c_CTRL-X_CTRL-E|).
+Some mappings will override default mappings (like CTRL-F).  For most of these
+mappings, the default mapping is still accessible through another mappings
+(like CTRL-X CTRL-E).  For others it is possible to set a variable to preserve
+the default mapping.
 
 ==============================================================================
 MAPPINGS					*readline-mappings*
@@ -33,8 +34,8 @@ CTRL-G			No operation.  CTRL-G is used to abort the current
 CTRL-B			Move cursor left.
 
 						*readline-c_CTRL-F*
-CTRL-F			Move cursor right.  Use |CTRL-X_CTRL-E| to access the
-			overridden Vim mapping.
+CTRL-F			Move cursor right.  Use CTRL-X CTRL-E to access the
+			overridden default mapping.
 
 						*readline-c_<Esc>b*
 <Esc>b		or				*readline-c_<Esc>B*
@@ -47,9 +48,8 @@ CTRL-F			Move cursor right.  Use |CTRL-X_CTRL-E| to access the
 			by non-alphanumeric characters.
 
 						*readline-c_CTRL-A*
-CTRL-A			Move cursor to beginning of line.  Use |<M-star>| or
-			|<Esc>star| to access the overridden default Vim
-			mapping.
+CTRL-A			Move cursor to beginning of line.  Use <Esc>* to access
+			the overridden default mapping.
 
 						*readline-c_CTRL-E*
 CTRL-E			Move cursor to end of line.
@@ -60,7 +60,7 @@ CTRL-H		or				*readline-c_<BS>*
 
 						*readline-c_CTRL-D*
 CTRL-D			Delete character under cursor.  Use <Esc>? to access
-			the overridden default Vim mapping.
+			the overridden default mapping.
 
 						*readline-c_<Esc>CTRL-H*
 <Esc>CTRL-H	or				*readline-c_<Esc><BS>*
@@ -82,11 +82,9 @@ CTRL-X <BS>					*readline-c_CTRL-U*
 CTRL-U			Delete to beginning of line.
 
 						*readline-c_CTRL-K*
-CTRL-K			Delete to end of line.  This overrides the default Vim
-			mapping to insert digraph.  You can set 'digraph' to
-			be able to insert digraphs using <BS> instead. Or you
-			can put `cnoremap <c-k> <c-k>` in your vimrc to
-			restore the default binding.
+CTRL-K			Delete to end of line.  Put `let g:readline_ctrl_k = 0`
+			in your vimrc to disable this mapping and preserve the
+			default |c_CTRL-K| mapping.
 
 						*readline-c_CTRL-Y*
 CTRL-Y			Yank (paste) previously deleted text.  Only text
@@ -141,37 +139,13 @@ accessed by using the ALT or META modifier, but that caused problems where
 some accented characters like ä would be interpreted as meta-key commands and
 trigger mappings.
 
-If that is not a problem for you, then you can use the following mappings to
-make the commands accessible by holding the META or ALT modifier. >
-
-  :cmap <M-C-g> <Esc><C-g>
-  :cmap <M-b> <Esc>b
-  :cmap <M-B> <Esc>B
-  :cmap <M-f> <Esc>f
-  :cmap <M-F> <Esc>F
-  :cmap <M-bs> <Esc><BS>
-  :cmap <M-d> <Esc>d
-  :cmap <M-D> <Esc>D
-  :cmap <M-t> <Esc>t
-  :cmap <M-T> <Esc>T
-  :cmap <M-u> <Esc>u
-  :cmap <M-U> <Esc>U
-  :cmap <M-l> <Esc>l
-  :cmap <M-L> <Esc>L
-  :cmap <M-c> <Esc>c
-  :cmap <M-C> <Esc>C
-  :cmap <M-?> <Esc>?
-  :cmap <M-=> <Esc>=
-  :cmap <M-*> <Esc>*
-<
-
-Also note that most terminals can be configured to send <Esc><Key> when <Key>
-is pressed the ALT modifier is held.
+Note that most terminals can be configured to send <Esc><Key> when <Key> is
+pressed and the ALT modifier is held.
 
 ==============================================================================
 INSERT MODE					*readline-insert*
 
-This plugin does not add readline-style commands to insert mode.  This is
+This plugin does not add Readline-style commands to insert mode.  This is
 because it is not very useful, as experienced Vim users will use normal mode
 for these commands.  Implementing these mappings in insert mode would also
 override a lot of useful default Vim bindings.  Some mappings also use <Esc>

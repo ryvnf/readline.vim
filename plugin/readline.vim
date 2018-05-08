@@ -2,8 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2017 Dec 31
-" Version:	1.4
+" Last Change:  2018 Apr 16
 " Licence:      The VIM LICENSE
 " ============================================================================
 
@@ -57,7 +56,9 @@ cnoremap <expr> <c-u> <sid>rubout_line()
 cnoremap <expr> <c-x><bs> <sid>rubout_line()
 
 " delete to end of line
-cnoremap <expr> <c-k> <sid>delete_line()
+if get(g:, 'readline_ctrl_k', 1)
+  cnoremap <expr> <c-k> <sid>delete_line()
+endif
 
 " transpose characters before cursor
 cnoremap <expr> <c-t> <sid>transpose_chars()
@@ -98,7 +99,7 @@ cnoremap <c-x><c-e> <c-f>
 " internal variables
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-" [:alnum:] and [:alpha:] only matches ASCII characters. But we can use the
+" [:alnum:] and [:alpha:] only matches ASCII characters.  But we can use the
 " fact that [:upper:] and [:lower:] will match non-ASCII characters to create
 " a pattern that will match alphanumeric characters from all encodings.
 let s:wordchars = '[[:upper:][:lower:][:digit:]]'
@@ -245,8 +246,8 @@ function! s:transpose_words()
   \ s:move_to(end2, beg1 + len2)
 endfunction
 
-" Get mapping to move cursor to position. Argument x is the position to move
-" to. Argument y is the current cursor position (note that this _must_ be in
+" Get mapping to move cursor to position.  Argument x is the position to move
+" to.  Argument y is the current cursor position (note that this _must_ be in
 " sync with the real cursor position).
 function! s:move_to(x, y)
   let cmd = ""
@@ -265,9 +266,9 @@ function! s:move_to(x, y)
   return cmd
 endfunction
 
-" Get mapping to delete from cursor to position. Argument x is the position to
-" delete to. Argument y represents the current cursor position (note that this
-" _must_ be in sync with the real cursor position).
+" Get mapping to delete from cursor to position.  Argument x is the position
+" to delete to.  Argument y represents the current cursor position (note that
+" this _must_ be in sync with the real cursor position).
 function! s:delete_to(x, y)
   let cmd = ""
   let s = getcmdline()
@@ -288,7 +289,7 @@ function! s:delete_to(x, y)
   return cmd
 endfunction
 
-" Get start position of previous word. Argument x is the position to search
+" Get start position of previous word.  Argument x is the position to search
 " from.
 function! s:prev_word(x)
   let s = getcmdline()
@@ -302,7 +303,7 @@ function! s:prev_word(x)
   return x
 endfunction
 
-" Get start position of previous space delimeted word. Argument x is the
+" Get start position of previous space delimeted word.  Argument x is the
 " position to search from.
 function! s:prev_longword(x)
   let s = getcmdline()
@@ -316,7 +317,7 @@ function! s:prev_longword(x)
   return x
 endfunction
 
-" Get end position of next word. Argument x is the position to search from.
+" Get end position of next word.  Argument x is the position to search from.
 function! s:next_word(x)
   let s = getcmdline()
   let n = strchars(s)
@@ -330,7 +331,7 @@ function! s:next_word(x)
   return x
 endfunction
 
-" Get the current cursor position on the edit line. This differs from
+" Get the current cursor position on the edit line.  This differs from
 " getcmdpos in that it counts chars intead of bytes and starts counting at 0.
 function! s:getcur()
   return strchars((getcmdline() . " ")[:getcmdpos() - 1]) - 1
