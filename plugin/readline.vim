@@ -2,7 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2018 Apr 16
+" Last Change:  2018 May 10
 " Licence:      The VIM LICENSE
 " ============================================================================
 
@@ -10,13 +10,11 @@
 " mappings
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-" avoid closing the cmdline by accident
-cnoremap <esc> <c-v><esc>
+" avoid quitting the cmdline on invalid mapping
+cnoremap <esc> <nop>
 
-" abort currently typed command
-cnoremap <c-g> <nop>
-cnoremap <esc><c-g> <nop>
-cnoremap <c-x><c-g> <nop>
+" avoid inserting ^X on invalid mapping
+cnoremap <c-x> <nop>
 
 " move to next char
 cnoremap <c-b> <left>

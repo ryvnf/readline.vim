@@ -23,13 +23,6 @@ the default mapping.
 ==============================================================================
 MAPPINGS					*readline-mappings*
 
-						*readline-c_CTRL-X_CTRL-G*
-CTRL-X CTRL-G	or				*readline-c_<Esc>CTRL-G*
-<Esc>CTRL-G	or				*readline-c_CTRL-G*
-CTRL-G			No operation.  CTRL-G is used to abort the current
-			command, no matter what keystrokes where typed before
-			it.
-
 						*readline-c_CTRL-B*
 CTRL-B			Move cursor left.
 
