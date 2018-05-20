@@ -1,4 +1,4 @@
-*readline.txt*	Readline-style mappings for command mode
+*readline.txt*	Readline-style mappings for command-line mode
 
 Author:		Elias Åstrom <github.com/ryvnf>
 License:	The VIM LICENSE (see |license|).  This Plugin is distributed
@@ -7,9 +7,9 @@ License:	The VIM LICENSE (see |license|).  This Plugin is distributed
 ==============================================================================
 INTRO						*readline*
 
-This plugin will add a subset of Readline's default bindings to Vim's command
-mode.  It implements the most commonly used functionality from Readline, which
-includes moving and deleting by words and some other stuff.
+This plugin will add a subset of Readline's default bindings to Vim's
+command-line mode.  It implements the most commonly used functionality from
+Readline, which includes moving and deleting by words and some other stuff.
 
 The word movement and deletion commands implemented by this plugin will skip
 word delimiters, this is different from what Vim usually does.  The change is

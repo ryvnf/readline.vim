@@ -1,6 +1,6 @@
 " ============================================================================
 " File:         plugin/readline.vim
-" Description:  Readline-style mappings for command mode
+" Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
 " Last Change:  2018 May 10
 " Licence:      The VIM LICENSE

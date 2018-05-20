@@ -8,7 +8,7 @@ familiar with.  The Readline default bindings is a mixture of traditional UNIX
 and EMACS bindings.
 
 This plugins implements a subset of Readline's default keyboard commands to
-Vim's command-mode.  Mappings available include deletion and navigation by
+Vim's command-line mode.  Mappings available include deletion and navigation by
 words and other useful stuff.
 
 Features
