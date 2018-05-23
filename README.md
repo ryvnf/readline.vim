@@ -65,12 +65,3 @@ More documentation
 
 See [the documentation](./doc/readline.txt) for documentation of all mappings
 implemented by this plugin.
-
-Meta-key
---------
-
-This plugin does not use the Meta-key directly, because it causes conflicts
-with inserting accented characters on some keyboard layouts.  Instead Meta-key
-mappings can only be accessed by prefixing the keys with Esc.  Most terminal
-emulators can be configured to send keys prefixed with Esc when the Alt
-modifier is held.

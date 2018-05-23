@@ -2,14 +2,14 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2018 May 10
+" Last Change:  2018 May 26
 " Licence:      The VIM LICENSE
 " ============================================================================
 
-if exists('g:loaded_readline') || &compatible
+if exists('loaded_readline') || &compatible
   finish
 endif
-let g:loaded_readline = 1
+let loaded_readline = 1
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " mappings
@@ -98,6 +98,29 @@ cnoremap <esc>* <c-a>
 " open cmdline-window
 cnoremap <c-x><c-e> <c-f>
 
+" meta key mappings
+if get(g:, 'readline_meta', 0) || has('nvim')
+  cmap <m-b> <esc>b
+  cmap <m-B> <esc>B
+  cmap <m-f> <esc>f
+  cmap <m-F> <esc>F
+  cmap <m-bs> <esc><bs>
+  cmap <m-d> <esc>d
+  cmap <m-D> <esc>D
+  cmap <m-t> <esc>t
+  cmap <m-T> <esc>T
+  cmap <m-u> <esc>u
+  cmap <m-U> <esc>U
+  cmap <m-l> <esc>l
+  cmap <m-L> <esc>L
+  cmap <m-c> <esc>c
+  cmap <m-C> <esc>C
+  cmap <m-#> <esc>#
+  cmap <m-?> <esc>?
+  cmap <m-=> <esc>=
+  cmap <m-*> <esc>*
+endif
+
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " internal variables
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -156,28 +179,18 @@ endfunction
 
 " get mapping to make word uppercase
 function! s:upcase_word()
-  let cmd = ""
-  let s = getcmdline()
   let x = s:getcur()
   let y = s:next_word(x)
-  while x < y
-    let cmd .= "\<del>" . toupper(strcharpart(s, x, 1))
-    let x += 1
-  endwhile
-  return substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
+  return repeat("\<del>", y - x) . substitute(toupper(strcharpart(
+  \ getcmdline(), x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to make word lowercase
 function! s:downcase_word()
-  let cmd = ""
-  let s = getcmdline()
   let x = s:getcur()
   let y = s:next_word(x)
-  while x < y
-    let cmd .= "\<del>" . tolower(strcharpart(s, x, 1))
-    let x += 1
-  endwhile
-  return substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
+  return repeat("\<del>", y - x) . substitute(tolower(strcharpart(
+  \ getcmdline(), x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to make word capitalized
@@ -196,10 +209,8 @@ function! s:capitalize_word()
       let cmd .= "\<right>"
     endif
   endwhile
-  while x < y
-    let cmd .= "\<del>" . tolower(strcharpart(s, x, 1))
-    let x += 1
-  endwhile
+  let cmd .= repeat("\<del>", y - x) . substitute(tolower(strcharpart(
+  \ getcmdline(), x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
   return substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
@@ -253,43 +264,22 @@ endfunction
 " to.  Argument y is the current cursor position (note that this _must_ be in
 " sync with the real cursor position).
 function! s:move_to(x, y)
-  let cmd = ""
-  let y = a:y
-  if y < a:x
-    while y < a:x
-      let cmd .= "\<right>"
-      let y += 1
-    endwhile
-  else
-    while a:x < y
-      let cmd .= "\<left>"
-      let y -= 1
-    endwhile
+  if a:y < a:x
+    return repeat("\<right>", a:x - a:y)
   endif
-  return cmd
+  return repeat("\<left>", a:y - a:x)
 endfunction
 
 " Get mapping to delete from cursor to position.  Argument x is the position
 " to delete to.  Argument y represents the current cursor position (note that
 " this _must_ be in sync with the real cursor position).
 function! s:delete_to(x, y)
-  let cmd = ""
-  let s = getcmdline()
-  let y = a:y
-  if y < a:x
-    let s:yankbuf = strcharpart(s, y, a:x - y)
-    while y < a:x
-      let cmd .= "\<del>"
-      let y += 1
-    endwhile
-  else
-    let s:yankbuf = strcharpart(s, a:x, y - a:x)
-    while a:x < y
-      let cmd .= "\b"
-      let y -= 1
-    endwhile
+  if a:y < a:x
+    let s:yankbuf = strcharpart(getcmdline(), a:y, a:x - a:y)
+    return repeat("\<del>", a:x - a:y)
   endif
-  return cmd
+  let s:yankbuf = strcharpart(getcmdline(), a:x, a:y - a:x)
+  return repeat("\b", a:y - a:x)
 endfunction
 
 " Get start position of previous word.  Argument x is the position to search

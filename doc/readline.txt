@@ -12,8 +12,9 @@ command-line mode.  It implements the most commonly used functionality from
 Readline, which includes moving and deleting by words and some other stuff.
 
 The word movement and deletion commands implemented by this plugin will skip
-word delimiters, this is different from what Vim usually does.  The change is
-made to be more like Readline, which also has this behavior.
+word delimiters, this is different from what Vim usually does.  _ (underscore)
+is also treated as a word delimiter.  These changes are made to be more like
+Readline, which also has this behavior.
 
 Some mappings will override default mappings (like CTRL-F).  For most of these
 mappings, the default mapping is still accessible through another mappings
@@ -30,52 +31,49 @@ CTRL-B			Move cursor left.
 CTRL-F			Move cursor right.  Use CTRL-X CTRL-E to access the
 			overridden default mapping.
 
-						*readline-c_<Esc>b*
-<Esc>b		or				*readline-c_<Esc>B*
-<Esc>B			Move cursor back to start of word.  Word is delimited by
-			non-alphanumeric characters.
+						*readline-c_META-B*
+<M-B>			Move cursor back to start of word.  Word is delimited
+			by non-alphanumeric characters.
 
-						*readline-c_<Esc>f*
-<Esc>f		or				*readline-c_<Esc>F*
-<Esc>F			Move cursor forward to end of word.  Word is delimited
+						*readline-c_META-F*
+<M-F>			Move cursor forward to end of word.  Word is delimited
 			by non-alphanumeric characters.
 
 						*readline-c_CTRL-A*
-CTRL-A			Move cursor to beginning of line.  Use <Esc>* to access
+CTRL-A			Move cursor to beginning of line.  Use <M-*> to access
 			the overridden default mapping.
 
 						*readline-c_CTRL-E*
 CTRL-E			Move cursor to end of line.
 
 						*readline-c_CTRL-H*
-CTRL-H		or				*readline-c_<BS>*
+CTRL-H		or				*readline-c_BS*
 <BS>			Delete character before cursor.
 
 						*readline-c_CTRL-D*
-CTRL-D			Delete character under cursor.  Use <Esc>? to access
+CTRL-D			Delete character under cursor.  Use <M-?> to access
 			the overridden default mapping.
 
-						*readline-c_<Esc>CTRL-H*
-<Esc>CTRL-H	or				*readline-c_<Esc><BS>*
-<Esc><BS>		Delete back to start of previous word.  Word is
+						*readline-c_META-CTRL-H*
+<M-C-H>		or				*readline-c_META-BS*
+<M-BS>			Delete back to start of previous word.  Word is
 			delimited by non-alphanumeric characters.
 
 						*readline-c_CTRL-W*
 CTRL-W			Delete to beginning of previous word.  Word is
 			delimited by spaces.
 
-						*readline-c_<Esc>d*
-<Esc>d		or				*readline-c_<Esc>D*
-<Esc>D			Delete forward to end of word.  Word is delimited by
+						*readline-c_META-D*
+<M-D>			Delete forward to end of word.  Word is delimited by
 			non-alphanumeric characters.
 
 						*readline-c_CTRL-X_CTRL-H*
-CTRL-X CTRL-H					*readline-c_CTRL-X_<BS>*
-CTRL-X <BS>					*readline-c_CTRL-U*
+CTRL-X CTRL-H	or				*readline-c_CTRL-X_BS*
+CTRL-X <BS>	or				*readline-c_CTRL-U*
 CTRL-U			Delete to beginning of line.
 
 						*readline-c_CTRL-K*
-CTRL-K			Delete to end of line.  Put `let g:readline_ctrl_k = 0`
+CTRL-K			Delete to end of line.  Use `let g:readline_ctrl_k = 0`
 			in your vimrc to disable this mapping and preserve the
 			default |c_CTRL-K| mapping.
 
@@ -87,35 +85,31 @@ CTRL-Y			Yank (paste) previously deleted text.  Only text
 						*readline-c_CTRL-T*
 CTRL-T			Transpose characters before the cursor.
 
-						*readline-c_<Esc>t*
-<Esc>t		or				*readline-c_<Esc>T*
-<Esc>T			Transpose words before the cursor.
+						*readline-c_META-T*
+<M-T>			Transpose words before the cursor.
 
-						*readline-c_<Esc>u*
-<Esc>u		or				*readline-c_<Esc>U*
-<Esc>U			Make word in front of cursor UPPERCASE.
+						*readline-c_META-U*
+<M-U>			Make word in front of cursor UPPERCASE.
 
-						*readline-c_<Esc>l*
-<Esc>l		or				*readline-c_<Esc>L*
-<Esc>L			Make word in front of cursor lowercase.
+						*readline-c_META-L*
+<M-L>			Make word in front of cursor lowercase.
 
-						*readline-c_<Esc>c*
-<Esc>c		or				*readline-c_<Esc>C*
-<Esc>C			Make word in front of cursor Capitalized.
+						*readline-c_META-C*
+<M-C>			Make word in front of cursor Capitalized.
 
-						*readline-c_<Esc>#*
-<Esc>#			Comment out the current command line and execute it.
+						*readline-c_META-#*
+<M-#>			Comment out the current command line and execute it.
 			This will put the line in history for later retrival,
 			without running it.
 
-						*readline-c_<Esc>=*
-<Esc>=		or				*readline-c_<Esc>?*
-<Esc>?			Display all names that match pattern in front of
+						*readline-c_META-=*
+<M-=>		or				*readline-c_META-?*
+<M-?>			Display all names that match pattern in front of
 			cursor.  Replacement for the default |c_CTRL-D|
 			mapping which gets overridden.
 
-						*readline-c_<Esc>star*
-<Esc>*			Insert all names that match pattern in front of
+						*readline-c_META-star*
+<M-*>			Insert all names that match pattern in front of
 			cursor.  Replacement for the default |c_CTRL-A|
 			mapping which gets overridden.
 
@@ -127,13 +121,20 @@ CTRL-X CTRL-E		Open command-line window.  See |cmdline| for more
 ==============================================================================
 META KEY					*readline-meta*
 
-This plugin uses <Esc> for META keys.  Previously the commands where also
-accessed by using the ALT or META modifier, but that caused problems where
-some accented characters like ä would be interpreted as meta-key commands and
-trigger mappings.
+This plugin uses <Esc> for META mappings.  This means that in order to trigger
+the <M-Key> mapping, you should use <Esc><Key>.  Previously the commands were
+also accessible by using the ALT or META modifier, but that caused problems
+where some accented characters like ä would be interpreted as meta-key
+commands and trigger mappings.
+
+If you want to access the mappings using the ALT or META modifier, you can
+enable them using `let g:readline_meta = 1` in your vimrc.  This option is
+ignored if using Nvim which does not have problems distinguishing the affected
+key-chords from special characters.
 
 Note that most terminals can be configured to send <Esc><Key> when <Key> is
-pressed and the ALT modifier is held.
+pressed and the ALT modifier is held.  This is highly recommended, and
+required for META key-chord mappings to work in Nvim.
 
 ==============================================================================
 INSERT MODE					*readline-insert*
@@ -142,10 +143,12 @@ This plugin does not add Readline-style commands to insert mode.  This is
 because it is not very useful, as experienced Vim users will use normal mode
 for these commands.  Implementing these mappings in insert mode would also
 override a lot of useful default Vim bindings.  Some mappings also use <Esc>
-which might cause problems with mode switching if implemented in insert-mode.
+which is known to cause problems with mode switching if mapped in insert-mode.
 
 ==============================================================================
 BUGS						*readline-bugs*
 
 If happen to find a bug, please create issue at
 <github.com/ryvnf/readline.vim>.
+
+ vim:tw=78:ts=8:ft=help:norl:
