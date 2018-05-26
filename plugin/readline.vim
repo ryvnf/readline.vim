@@ -6,10 +6,10 @@
 " Licence:      The VIM LICENSE
 " ============================================================================
 
-if exists('loaded_readline') || &compatible
+if exists('g:loaded_readline') || &compatible
   finish
 endif
-let loaded_readline = 1
+let g:loaded_readline = 1
 
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " mappings
@@ -274,6 +274,9 @@ endfunction
 " to delete to.  Argument y represents the current cursor position (note that
 " this _must_ be in sync with the real cursor position).
 function! s:delete_to(x, y)
+  if a:y == a:x
+    return ""
+  endif
   if a:y < a:x
     let s:yankbuf = strcharpart(getcmdline(), a:y, a:x - a:y)
     return repeat("\<del>", a:x - a:y)
