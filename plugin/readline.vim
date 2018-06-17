@@ -2,7 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2018 May 26
+" Last Change:  2018 June 17
 " Licence:      The VIM LICENSE
 " ============================================================================
 
@@ -22,10 +22,10 @@ cnoremap <esc> <nop>
 cnoremap <c-x> <nop>
 
 " move to next char
-cnoremap <c-b> <left>
+cnoremap <c-b> <space><bs><left>
 
 " move to previous char
-cnoremap <c-f> <right>
+cnoremap <c-f> <space><bs><right>
 
 " move back to start of word
 cnoremap <expr> <esc>b <sid>back_word()
@@ -140,13 +140,13 @@ let s:yankbuf = ''
 " get mapping to move one word forward
 function! s:forward_word()
   let x = s:getcur()
-  return s:move_to(s:next_word(x), x)
+  return " \b" . s:move_to(s:next_word(x), x)
 endfunction
 
 " get mapping to move one word back
 function! s:back_word()
   let x = s:getcur()
-  return s:move_to(s:prev_word(x), x)
+  return " \b" . s:move_to(s:prev_word(x), x)
 endfunction
 
 " get mapping to rubout word behind cursor
@@ -211,7 +211,7 @@ function! s:capitalize_word()
   endwhile
   let cmd .= repeat("\<del>", y - x) . substitute(tolower(strcharpart(
   \ getcmdline(), x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
-  return substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
+  return " \b" . substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to yank (paste) the previously deleted text
@@ -232,7 +232,7 @@ function! s:transpose_chars()
     let cmd .= "\<left>"
     let x -= 1
   endif
-  return cmd . "\b\<right>" .
+  return " \b" . cmd . "\b\<right>" .
   \ substitute(strcharpart(s, x - 1, 1), '[[:cntrl:]]', "\<c-v>&", '')
 endfunction
 
@@ -254,7 +254,7 @@ function! s:transpose_words()
   let str2 = strcharpart(s, beg2, end2 - beg2)
   let len1 = strchars(str1)
   let len2 = strchars(str2)
-  return s:move_to(end2, x) . repeat("\b", len2) . str1 .
+  return " \b" . s:move_to(end2, x) . repeat("\b", len2) . str1 .
   \ s:move_to(end1, beg2 + len1) . repeat("\b", len1) .
   \ substitute(str2, '[[:cntrl:]]', "\<c-v>&", 'g') .
   \ s:move_to(end2, beg1 + len2)
