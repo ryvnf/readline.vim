@@ -3,7 +3,7 @@
 " Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
 " Last Change:  2018 June 17
-" Licence:      The VIM LICENSE
+" License:      The VIM LICENSE
 " ============================================================================
 
 if exists('g:loaded_readline') || &compatible
