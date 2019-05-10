@@ -2,7 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2018 June 17
+" Last Change:  2019 May 10
 " License:      The VIM LICENSE
 " ============================================================================
 
@@ -86,7 +86,7 @@ cnoremap <expr> <esc>c <sid>capitalize_word()
 cnoremap <expr> <esc>C <sid>capitalize_word()
 
 " comment out line and execute it
-cnoremap <expr> <esc># <c-b>"<cr>
+cnoremap <esc># <c-b>"<cr>
 
 " list all completion matches
 cnoremap <esc>? <c-d>
@@ -155,7 +155,7 @@ function! s:rubout_word()
   return s:delete_to(s:prev_word(x), x)
 endfunction
 
-" get mapping to rubout space delimeted word behind of cursor
+" get mapping to rubout space delimited word behind of cursor
 function! s:rubout_longword()
   let x = s:getcur()
   return s:delete_to(s:prev_longword(x), x)
@@ -169,7 +169,7 @@ endfunction
 
 " get mapping to delete to end of line
 function! s:delete_line()
-  return s:delete_to(strchars(getcmdline()), s:getcur())
+  return s:delete_to(s:strlen(getcmdline()), s:getcur())
 endfunction
 
 " get mapping to rubout to start of line
@@ -181,16 +181,16 @@ endfunction
 function! s:upcase_word()
   let x = s:getcur()
   let y = s:next_word(x)
-  return repeat("\<del>", y - x) . substitute(toupper(strcharpart(
-  \ getcmdline(), x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
+  return repeat("\<del>", y - x) . substitute(toupper(s:strpart(getcmdline(),
+  \ x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to make word lowercase
 function! s:downcase_word()
   let x = s:getcur()
   let y = s:next_word(x)
-  return repeat("\<del>", y - x) . substitute(tolower(strcharpart(
-  \ getcmdline(), x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
+  return repeat("\<del>", y - x) . substitute(tolower(s:strpart(getcmdline(),
+  \ x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
 
 " get mapping to make word capitalized
@@ -200,16 +200,16 @@ function! s:capitalize_word()
   let x = s:getcur()
   let y = s:next_word(x)
   while x < y
-    let c = strcharpart(s, x, 1)
+    let c = s:strpart(s, x, 1)
     let x += 1
     if c =~ s:wordchars
-      let cmd .= "\<del>" . toupper(strcharpart(s, x - 1, 1))
+      let cmd .= "\<del>" . toupper(s:strpart(s, x - 1, 1))
       break
     else
       let cmd .= "\<right>"
     endif
   endwhile
-  let cmd .= repeat("\<del>", y - x) . substitute(tolower(strcharpart(
+  let cmd .= repeat("\<del>", y - x) . substitute(tolower(s:strpart(
   \ getcmdline(), x, y - x)), '[[:cntrl:]]', "\<c-v>&", 'g')
   return " \b" . substitute(cmd, '[[:cntrl:]]', "\<c-v>&", 'g')
 endfunction
@@ -222,7 +222,7 @@ endfunction
 " get mapping to transpose chars before cursor position
 function! s:transpose_chars()
   let s = getcmdline()
-  let n = strchars(s)
+  let n = s:strlen(s)
   let x = s:getcur()
   if x == 0 || n < 2
     return ""
@@ -233,7 +233,7 @@ function! s:transpose_chars()
     let x -= 1
   endif
   return " \b" . cmd . "\b\<right>" .
-  \ substitute(strcharpart(s, x - 1, 1), '[[:cntrl:]]', "\<c-v>&", '')
+  \ substitute(s:strpart(s, x - 1, 1), '[[:cntrl:]]', "\<c-v>&", '')
 endfunction
 
 " get mapping to transpose words before cursor position
@@ -241,7 +241,7 @@ function! s:transpose_words()
   let s = getcmdline()
   let x = s:getcur()
   let end2 = s:next_word(x)
-  if strcharpart(s, x, 1) == ""
+  if s:strpart(s, x, 1) == ""
     let x -= 1
   endif
   let beg2 = s:prev_word(end2)
@@ -250,10 +250,10 @@ function! s:transpose_words()
   if beg1 == beg2 || beg2 < end1
     return ""
   endif
-  let str1 = strcharpart(s, beg1, end1 - beg1)
-  let str2 = strcharpart(s, beg2, end2 - beg2)
-  let len1 = strchars(str1)
-  let len2 = strchars(str2)
+  let str1 = s:strpart(s, beg1, end1 - beg1)
+  let str2 = s:strpart(s, beg2, end2 - beg2)
+  let len1 = s:strlen(str1)
+  let len2 = s:strlen(str2)
   return " \b" . s:move_to(end2, x) . repeat("\b", len2) . str1 .
   \ s:move_to(end1, beg2 + len1) . repeat("\b", len1) .
   \ substitute(str2, '[[:cntrl:]]', "\<c-v>&", 'g') .
@@ -278,10 +278,10 @@ function! s:delete_to(x, y)
     return ""
   endif
   if a:y < a:x
-    let s:yankbuf = strcharpart(getcmdline(), a:y, a:x - a:y)
+    let s:yankbuf = s:strpart(getcmdline(), a:y, a:x - a:y)
     return repeat("\<del>", a:x - a:y)
   endif
-  let s:yankbuf = strcharpart(getcmdline(), a:x, a:y - a:x)
+  let s:yankbuf = s:strpart(getcmdline(), a:x, a:y - a:x)
   return repeat("\b", a:y - a:x)
 endfunction
 
@@ -290,24 +290,24 @@ endfunction
 function! s:prev_word(x)
   let s = getcmdline()
   let x = a:x
-  while x > 0 && strcharpart(s, x - 1, 1) !~ s:wordchars
+  while x > 0 && s:strpart(s, x - 1, 1) !~ s:wordchars
     let x -= 1
   endwhile
-  while x > 0 && strcharpart(s, x - 1, 1) =~ s:wordchars
+  while x > 0 && s:strpart(s, x - 1, 1) =~ s:wordchars
     let x -= 1
   endwhile
   return x
 endfunction
 
-" Get start position of previous space delimeted word.  Argument x is the
+" Get start position of previous space delimited word.  Argument x is the
 " position to search from.
 function! s:prev_longword(x)
   let s = getcmdline()
   let x = a:x
-  while x > 0 && strcharpart(s, x - 1, 1) !~ '\S'
+  while x > 0 && s:strpart(s, x - 1, 1) !~ '\S'
     let x -= 1
   endwhile
-  while x > 0 && strcharpart(s, x - 1, 1) =~ '\S'
+  while x > 0 && s:strpart(s, x - 1, 1) =~ '\S'
     let x -= 1
   endwhile
   return x
@@ -316,19 +316,41 @@ endfunction
 " Get end position of next word.  Argument x is the position to search from.
 function! s:next_word(x)
   let s = getcmdline()
-  let n = strchars(s)
+  let n = s:strlen(s)
   let x = a:x
-  while x < n && strcharpart(s, x, 1) !~ s:wordchars
+  while x < n && s:strpart(s, x, 1) !~ s:wordchars
     let x += 1
   endwhile
-  while x < n && strcharpart(s, x, 1) =~ s:wordchars
+  while x < n && s:strpart(s, x, 1) =~ s:wordchars
     let x += 1
   endwhile
   return x
 endfunction
 
 " Get the current cursor position on the edit line.  This differs from
-" getcmdpos in that it counts chars intead of bytes and starts counting at 0.
+" getcmdpos in that it counts chars instead of bytes and starts counting at 0.
 function! s:getcur()
-  return strchars((getcmdline() . " ")[:getcmdpos() - 1]) - 1
+  return s:strlen((getcmdline() . ' ')[:getcmdpos() - 1]) - 1
 endfunction
+
+" for compatibility with earlier versions without strchars
+if exists('*strchars')
+  function! s:strlen(s)
+    return strchars(a:s, 1)
+  endfunction
+else
+  function! s:strlen(s)
+    return strlen(a:s)
+  endfunction
+endif
+
+" for compatibility with earlier versions without strcharpart
+if exists('*strcharpart')
+  function! s:strpart(s, n, m)
+    return strcharpart(a:s, a:n, a:m)
+  endfunction
+else
+  function! s:strpart(s, n, m)
+    return strpart(a:s, a:n, a:m)
+  endfunction
+endif
