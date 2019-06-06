@@ -122,19 +122,24 @@ CTRL-X CTRL-E		Open command-line window.  See |cmdline| for more
 META KEY					*readline-meta*
 
 This plugin uses <Esc> for META mappings.  This means that in order to trigger
-the <M-Key> mapping, you should use <Esc><Key>.  Previously the commands were
-also accessible by using the ALT or META modifier, but that caused problems
-where some accented characters like ä would be interpreted as meta-key
-commands and trigger mappings.
+the <M-Key> mapping, the input <Esc><Key> should be received.  The reason for
+this is that Vim cannot distinguish some accented characters like ä from
+META-keycodes.  Most terminal emulators can be configured to send <Esc><Key>
+when <Key> is pressed and the ALT-modifier is held.  This is highly
+recommended for the plugin to work properly.
 
-If you want to access the mappings using the ALT or META modifier, you can
-enable them using `let g:readline_meta = 1` in your vimrc.  This option is
-ignored if using Nvim which does not have problems distinguishing the affected
-key-chords from special characters.
+In some situations (like in the graphical Vim GUI) that is not possible.  If
+you want to access the mappings using the ALT or META modifier in these
+situations, you can enable it by using `let g:readline_meta = 1` in your
+vimrc.  This might interfere with your ability to insert characters like ä on
+the command-line.
 
-Note that most terminals can be configured to send <Esc><Key> when <Key> is
-pressed and the ALT modifier is held.  This is highly recommended, and
-required for META key-chord mappings to work in Nvim.
+By default it is not possible to trigger mappings by pressing <Esc> followed
+by another key sequentially.  This is because all the keys in the mapping have
+to be received simultaneously.  If you want to be able to trigger mappings by
+pressing <Esc> manually, you can enable it by using `let g:readline_esc = 1`
+in your vimrc.  When this is enabled it is no longer possible to quit the
+command-line using <Esc>.
 
 ==============================================================================
 INSERT MODE					*readline-insert*

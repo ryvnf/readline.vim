@@ -2,7 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2019 May 10
+" Last Change:  2019 June 9
 " License:      The VIM LICENSE
 " ============================================================================
 
@@ -14,12 +14,6 @@ let g:loaded_readline = 1
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 " mappings
 "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-" avoid quitting the cmdline on invalid mapping
-cnoremap <esc> <nop>
-
-" avoid inserting ^X on invalid mapping
-cnoremap <c-x> <nop>
 
 " move to next char
 cnoremap <c-b> <space><bs><left>
@@ -98,8 +92,26 @@ cnoremap <esc>* <c-a>
 " open cmdline-window
 cnoremap <c-x><c-e> <c-f>
 
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+" mapping options
+"~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+" escape mappings
+if get(g:, 'readline_esc', 0) || v:version <= 703
+  cnoremap <esc> <nop>
+else
+  " emulate escape unless it was pressed using a modifier
+  function s:esc()
+    if getchar(0)
+      return ""
+    endif
+    return &cpoptions =~ "x" ? "\<cr>" : "\<c-c>"
+  endfunction
+  cnoremap <nowait> <expr> <esc> <sid>esc()
+endif
+
 " meta key mappings
-if get(g:, 'readline_meta', 0) || has('nvim')
+if get(g:, 'readline_meta', has('nvim'))
   cmap <m-b> <esc>b
   cmap <m-B> <esc>B
   cmap <m-f> <esc>f
