@@ -2,7 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2019 June 9
+" Last Change:  2019 August 24
 " License:      The VIM LICENSE
 " ============================================================================
 
@@ -111,7 +111,7 @@ else
 endif
 
 " meta key mappings
-if get(g:, 'readline_meta', has('nvim'))
+if get(g:, 'readline_meta', 0) || has('nvim')
   cmap <m-b> <esc>b
   cmap <m-B> <esc>B
   cmap <m-f> <esc>f
@@ -233,6 +233,9 @@ endfunction
 
 " get mapping to transpose chars before cursor position
 function! s:transpose_chars()
+  if !get(g:, 'readline_ctrl_t', 1) && &incsearch && getcmdtype() =~ '[/?]'
+    return "\<c-t>"
+  endif
   let s = getcmdline()
   let n = s:strlen(s)
   let x = s:getcur()
