@@ -1,7 +1,7 @@
 *readline.txt*	Readline-style mappings for command-line mode
 
 Author:		Elias Åstrom <github.com/ryvnf>
-License:	The VIM LICENSE (see |license|).  This Plugin is distributed
+License:	The VIM LICENSE (see |license|).  This plugin is distributed
 		under the same conditions as Vim itself.
 
 ==============================================================================
@@ -83,7 +83,10 @@ CTRL-Y			Yank (paste) previously deleted text.  Only text
 			lines can be recalled.
 
 						*readline-c_CTRL-T*
-CTRL-T			Transpose characters before the cursor.
+CTRL-T			Transpose characters before the cursor.  Use
+			`let g:readline_ctrl_t = 0` in your vimrc to disable
+			this mapping and preserve the default |c_CTRL-T|
+			mapping when 'incsearch' is active.
 
 						*readline-c_META-T*
 <M-T>			Transpose words before the cursor.
