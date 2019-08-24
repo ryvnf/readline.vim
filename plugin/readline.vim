@@ -105,7 +105,7 @@ else
     if getchar(0)
       return ""
     endif
-    return &cpoptions =~ "x" ? "\<cr>" : "\<c-c>"
+    return &cpoptions =~# "x" ? "\<cr>" : "\<c-c>"
   endfunction
   cnoremap <nowait> <expr> <esc> <sid>esc()
 endif
@@ -214,7 +214,7 @@ function! s:capitalize_word()
   while x < y
     let c = s:strpart(s, x, 1)
     let x += 1
-    if c =~ s:wordchars
+    if c =~# s:wordchars
       let cmd .= "\<del>" . toupper(s:strpart(s, x - 1, 1))
       break
     else
@@ -233,7 +233,7 @@ endfunction
 
 " get mapping to transpose chars before cursor position
 function! s:transpose_chars()
-  if !get(g:, 'readline_ctrl_t', 1) && &incsearch && getcmdtype() =~ '[/?]'
+  if !get(g:, 'readline_ctrl_t', 1) && &incsearch && getcmdtype() =~# '[/?]'
     return "\<c-t>"
   endif
   let s = getcmdline()
@@ -305,10 +305,10 @@ endfunction
 function! s:prev_word(x)
   let s = getcmdline()
   let x = a:x
-  while x > 0 && s:strpart(s, x - 1, 1) !~ s:wordchars
+  while x > 0 && s:strpart(s, x - 1, 1) !~# s:wordchars
     let x -= 1
   endwhile
-  while x > 0 && s:strpart(s, x - 1, 1) =~ s:wordchars
+  while x > 0 && s:strpart(s, x - 1, 1) =~# s:wordchars
     let x -= 1
   endwhile
   return x
@@ -319,10 +319,10 @@ endfunction
 function! s:prev_longword(x)
   let s = getcmdline()
   let x = a:x
-  while x > 0 && s:strpart(s, x - 1, 1) !~ '\S'
+  while x > 0 && s:strpart(s, x - 1, 1) !~# '\S'
     let x -= 1
   endwhile
-  while x > 0 && s:strpart(s, x - 1, 1) =~ '\S'
+  while x > 0 && s:strpart(s, x - 1, 1) =~# '\S'
     let x -= 1
   endwhile
   return x
@@ -333,10 +333,10 @@ function! s:next_word(x)
   let s = getcmdline()
   let n = s:strlen(s)
   let x = a:x
-  while x < n && s:strpart(s, x, 1) !~ s:wordchars
+  while x < n && s:strpart(s, x, 1) !~# s:wordchars
     let x += 1
   endwhile
-  while x < n && s:strpart(s, x, 1) =~ s:wordchars
+  while x < n && s:strpart(s, x, 1) =~# s:wordchars
     let x += 1
   endwhile
   return x
