@@ -351,7 +351,11 @@ endfunction
 " for compatibility with earlier versions without strchars
 if exists('*strchars')
   function! s:strlen(s)
-    return strchars(a:s, 1)
+    if v:version >= 800
+      return strchars(a:s, 1)
+    else
+      return strchars(a:s)
+    endif
   endfunction
 else
   function! s:strlen(s)
