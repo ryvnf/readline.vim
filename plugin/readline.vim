@@ -2,7 +2,7 @@
 " File:         plugin/readline.vim
 " Description:  Readline-style mappings for command-line mode
 " Author:       Elias Astrom <github.com/ryvnf>
-" Last Change:  2019 August 24
+" Last Change:  2019 December 28
 " License:      The VIM LICENSE
 " ============================================================================
 
@@ -101,7 +101,7 @@ if get(g:, 'readline_esc', 0) || v:version <= 703
   cnoremap <esc> <nop>
 else
   " emulate escape unless it was pressed using a modifier
-  function s:esc()
+  function! s:esc()
     if getchar(0)
       return ""
     endif
@@ -239,7 +239,7 @@ function! s:transpose_chars()
   let s = getcmdline()
   let n = s:strlen(s)
   let x = s:getcur()
-  if x == 0 || n < 2
+  if n < 2
     return ""
   endif
   let cmd = ""
@@ -256,13 +256,10 @@ function! s:transpose_words()
   let s = getcmdline()
   let x = s:getcur()
   let end2 = s:next_word(x)
-  if s:strpart(s, x, 1) == ""
-    let x -= 1
-  endif
   let beg2 = s:prev_word(end2)
   let beg1 = s:prev_word(beg2)
   let end1 = s:next_word(beg1)
-  if beg1 == beg2 || beg2 < end1
+  if beg2 < end1
     return ""
   endif
   let str1 = s:strpart(s, beg1, end1 - beg1)
