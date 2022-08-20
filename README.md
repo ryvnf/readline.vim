@@ -2,10 +2,10 @@ readline.vim
 ============
 
 Readline is a library used for implementing line editing across many
-command-line tools (including `bash` and other shells and interpreters).
-Readline ships with a default set of key-bindings that you are probably already
-familiar with.  The Readline default bindings is a mixture of traditional UNIX
-and EMACS bindings.
+command-line tools (including Bash and other shells and interpreters).  Readline
+ships with a default set of key-bindings that you are probably already familiar
+with.  The Readline default bindings is a mixture of traditional Unix and Emacs
+bindings.
 
 This plugins implements a subset of Readline's default keyboard commands to
 Vim's command-line mode.  Mappings available include deletion and navigation by
