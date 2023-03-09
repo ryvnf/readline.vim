@@ -7,16 +7,16 @@ License:	The VIM LICENSE (see |license|).  This plugin is distributed
 ==============================================================================
 INTRO						*readline*
 
-This plugin will add a subset of Readline's default bindings to Vim's
-command-line mode.  It implements the most commonly used functionality from
-Readline, which includes moving and deleting by words and some other stuff.
+This plugin adds a subset of Readline's default bindings to Vim's command-line
+mode.  It implements the most commonly used functionality from Readline, which
+includes moving and deleting by words and some other stuff.
 
-The word movement and deletion commands implemented by this plugin will skip
-word delimiters, this is different from what Vim usually does.  _ (underscore)
-is also treated as a word delimiter.  These changes are made to be more like
+The word movement and deletion commands implemented by this plugin skips word
+delimiters, this is different from what Vim usually does.  _ (underscore) is
+also treated as a word delimiter.  These changes are made to be more like
 Readline, which also has this behavior.
 
-Some mappings will override default mappings (like CTRL-F).  For most of these
+Some mappings overrides default mappings (like CTRL-F).  For most of these
 mappings, the default mapping is still accessible through another mappings
 (like CTRL-X CTRL-E).  For others it is possible to set a variable to preserve
 the default mapping.
@@ -148,10 +148,11 @@ command-line using <Esc>.
 INSERT MODE					*readline-insert*
 
 This plugin does not add Readline-style commands to insert mode.  This is
-because it is not very useful, as experienced Vim users will use normal mode
-for these commands.  Implementing these mappings in insert mode would also
-override a lot of useful default Vim bindings.  Some mappings also use <Esc>
-which is known to cause problems with mode switching if mapped in insert-mode.
+because it is not very useful, as experienced Vim users usually use normal
+mode for these commands.  Implementing these mappings in insert mode would
+also override a lot of useful Vim default bindings.  Some mappings also use
+<Esc> which is known to cause problems with switching to normal mode if mapped
+in insert-mode.
 
 ==============================================================================
 BUGS						*readline-bugs*
